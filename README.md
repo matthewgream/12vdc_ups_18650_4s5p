@@ -154,7 +154,8 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 | n | DC blade fuses 2/3/5/10 A | £0.93 | F0 10 A, F1 5 A, F2–F6 2/2/3/3/5 A. Name-brand with 1000 A DC interrupt rating recommended for F0. | [AliExpress](https://www.aliexpress.com/item/4000832079230.html) |
 | 1 | DC 5.5/2.x barrel panel connector, 10 A, 15 cm | £1.37 | Mains adapter input jack | [AliExpress](https://www.aliexpress.com/item/1005007189485497.html) |
 | 5 | DC 5.5/2.x power leads, 18 AWG, 1.5 m | £3.26 | One per output. Match inner diameter (2.1 or 2.5 mm) to each device. 18 AWG is good to ~7 A. | [AliExpress](https://www.aliexpress.com/item/1005012145395888.html) |
-| 2 | 16 mm LED indicator, panel mount, 3–6 V | £1.35 | External status LEDs via J8 (e.g. input power, charging/fault). A smaller size may fit better. | [AliExpress](https://www.aliexpress.com/item/1005008299613973.html) |
+| 1 | DC voltage level display (panel meter) | £4.69 | Front-panel battery/voltage readout; fits the 60 × 30 mm window in the cover. | [AliExpress](https://www.aliexpress.com/item/1005006408211879.html) |
+| 2 | 6 mm LED indicator, panel mount, 3–6 V | £0.78 | Front-panel status LEDs via J8 (e.g. input power, charging/fault), mounted in the cover beside the meter. 5-pack (£3.89). | [AliExpress](https://www.aliexpress.com/item/1005005391948256.html) |
 | 20 | LG MJ1 18650, 3500 mAh, 10 A | £2.81 | 4S5P, welded in a 10 × 2 honeycomb array | [Cell Supply](https://www.cellsupply.co.uk/lg-mj1-18650-battery) |
 | 1 | 2-core 18 AWG silicone tinned copper wire | £1.60 | Internal hookup | [AliExpress](https://www.aliexpress.com/item/1005012526819544.html) |
 | 1 | Anderson 30 A connector | £2.51 | Pack-to-board connection and safety disconnect | [AliExpress](https://www.aliexpress.com/item/1005006226687227.html) |

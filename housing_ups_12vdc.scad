@@ -7,7 +7,8 @@
 //             carrier). The right side carries a panel DC socket at the top, 6 DC-out lead
 //             holes below it, and — only with fuse_holder_external — the mounting holes +
 //             feed slot + outline of a fuse-carrier standoff block lower down; the top side
-//             carries 3 panel-mount LEDs. Interior "furniture" (no full dividers): corner
+//             is fully grilled, or carries panel LEDs when led_side is set. Interior
+//             "furniture" (no full dividers): corner
 //             brackets that grip a 4s5p 18650 pack on one side, side-grip walls +
 //             standoffs for a BMS, and four screw posts for a power board above it.
 //             mirror_lr flips the whole layout left<->right (pack on the right by default).
@@ -25,6 +26,22 @@
 //    taller than the interior, and pack+board wider than the interior, and deeper than
 //    the box once a standoff is added. echo() warnings below compute the shortfalls.
 //    Bump ext_w / ext_h / ext_d (≈135 x 235 x 48) and the furniture re-places itself.
+
+// ---------------------------------------------------------------------------
+// CONFIGURATION — the gross-level choices, in one place (defaults in [brackets]).
+// Each flag is defined with its own group further down; override on the CLI with
+// -D 'name=value' (e.g. openscad -D 'fuse_holder_external=true' ...).
+//   part                 "base" | "cover" | "all" | "assembly"  — which part(s) to emit / preview
+//   mirror_lr            [true]   L↔R mirror: true = pack on the RIGHT (BMS/board/DC/fuse LEFT)
+//   fuse_holder_external [false]  false = internal inline fuses (nothing printed);
+//                                 true  = external fuse carrier on the right wall
+//                                         (bolt holes + feed slot + wall outline + assembly block)
+//   led_side             [false]  false = no top-wall LEDs, top grill runs full width
+//                                         (LEDs go elsewhere, e.g. the front panel);
+//                                 true  = panel LEDs drilled in the top wall, top grill left half
+//   show_components      [true]   assembly view: colour block stand-ins for the fitted parts
+//   meter_on, cover_led_on [true] front-panel meter window + relocated LED holes (on the cover)
+// ---------------------------------------------------------------------------
 
 // === FLAGS ===
 part = "all";   // "base" | "cover" | "all" (apart) | "assembly" (cover on base)
@@ -69,7 +86,9 @@ lead_n      = 5;
 lead_pitch  = 10;                // lead-hole centre-to-centre
 lead_dc_gap = 20;                // from the DC socket down to the first (topmost) lead
 lead_y0     = dc_y - lead_dc_gap;// topmost lead; the rest step DOWN by lead_pitch
-led_d      = 16;                // 3 panel LEDs through the TOP wall (big bezels)
+led_side   = false;             // LEDs in the TOP wall? false (default) -> no LED holes (led_* ignored)
+                                //   and the top grill runs full width; true -> drill the LEDs, grill left half only
+led_d      = 16;                // panel LEDs through the TOP wall (big bezels) -- only when led_side
 led_n      = 2;
 led_offset = 24;                // first (rightmost) LED centre, measured in from the right (ext_w) edge
 led_pitch  = 24;                // LED centre-to-centre; the rest step left from the first
@@ -154,6 +173,25 @@ border_h   = 1;     // outline raised height
 mono_w     = 24;    // debossed hat width on the cover
 mono_sink  = 0.8;
 
+// === Cover front-panel cutouts (meter window + relocated LEDs) ===
+// Offsets read as they do in the ASSEMBLED enclosure: X in from the DC-side edge, Y down from the
+// top edge (next to the DC input). The cover flips LEFT/RIGHT onto the base (see Dispatch), so this
+// print frame maps straight through and the cutouts sit on the DC-side (left), at the top. Square
+// corners; the display's own bezel oversits the hole, so the cutout is the body size. All tunable.
+meter_on     = true;   // rectangular display/meter window through the front panel
+meter_w      = 60;     // window width  (X)
+meter_h      = 30;     // window height (Y)
+meter_x_in   = 18;     // gap from the DC-side edge to the window's near edge
+meter_y_in   = 12;     // gap from the top edge to the window's top edge
+meter_depth  = 10;     // meter body depth under the panel (assembly clearance block only)
+
+cover_led_on    = true;  // vertical pair of relocated LED holes, just outboard of the meter
+cover_led_d     = 6;     // LED hole Ø
+cover_led_x     = 10;    // LED column centre, in from the DC-side edge (sits between meter & edge)
+cover_led_y1    = 18;    // first (upper) LED centre, down from the top edge
+cover_led_pitch = 10;    // next LED this far below the first (centre-to-centre)
+cover_led_n     = 2;     // LEDs in the column
+
 // ---------------------------------------------------------------------------
 // Helpers
 module rrect(w, h, r) offset(r) offset(-r) square([w, h], center = true);
@@ -185,8 +223,8 @@ module base_shell() difference() {
 // grills: top & bottom walls full; left & right walls over their bottom half
 module base_grills() {
     zs  = [for (z = [back_t + grill_marg : grill_pitch : base_wall_h - grill_marg]) z];
-    // top wall (+Y) -- LEFT half only (right reserved for the LEDs)
-    tg_x0 = grill_marg; tg_x1 = ext_w/2 - 4; tg_len = tg_x1 - tg_x0;
+    // top wall (+Y) -- full width, unless led_side reserves the right half for the panel LEDs
+    tg_x0 = grill_marg; tg_x1 = led_side ? ext_w/2 - 4 : ext_w - grill_marg; tg_len = tg_x1 - tg_x0;
     for (z = zs) translate([(tg_x0 + tg_x1)/2, ext_h + 1, z]) xslot(tg_len, grill_slot, wall + 2);
     // bottom wall (-Y) -- full width
     bw_len = ext_w - 2*grill_marg;
@@ -204,9 +242,10 @@ module base_apertures() {
     translate([ext_w - wall - 1, dc_y, zc]) rotate([0, 90, 0]) cylinder(h = wall + 2, d = dc_d);
     for (i = [0 : lead_n - 1])
         translate([ext_w - wall - 1, lead_y0 - i*lead_pitch, zc]) rotate([0, 90, 0]) cylinder(h = wall + 2, d = lead_d);
-    // TOP wall: 3 LEDs (cylinders along Y), stepping left from the right end
-    for (i = [0 : led_n - 1])
-        translate([ext_w - led_offset - i * led_pitch, ext_h - wall - 1, zc]) rotate([-90, 0, 0]) cylinder(h = wall + 2, d = led_d);
+    // TOP wall: panel LEDs (cylinders along Y), stepping left from the right end -- only when led_side
+    if (led_side)
+        for (i = [0 : led_n - 1])
+            translate([ext_w - led_offset - i * led_pitch, ext_h - wall - 1, zc]) rotate([-90, 0, 0]) cylinder(h = wall + 2, d = led_d);
     // RIGHT wall: fuse-carrier mounting-bolt holes (2, along Y) + lead feed-through slot, centred on the block
     if (fuse_holder_external) {
         for (s = [-1, 1])
@@ -320,10 +359,15 @@ module components() {
     // DC socket — barrel poking in through the RIGHT wall
     color([0.12, 0.12, 0.12]) translate([ext_w - wall - dc_body_len, dc_y, (back_t + base_wall_h)/2])
         rotate([0, 90, 0]) cylinder(h = dc_body_len, d = dc_d + 3);
-    // LEDs — bodies poking in through the TOP wall
-    for (i = [0 : led_n - 1])
-        color([0.90, 0.22, 0.20]) translate([ext_w - led_offset - i*led_pitch, ext_h - wall - led_body_len, (back_t + base_wall_h)/2])
-            rotate([-90, 0, 0]) cylinder(h = led_body_len, d = led_d);
+    // LEDs — bodies poking in through the TOP wall (only when led_side)
+    if (led_side)
+        for (i = [0 : led_n - 1])
+            color([0.90, 0.22, 0.20]) translate([ext_w - led_offset - i*led_pitch, ext_h - wall - led_body_len, (back_t + base_wall_h)/2])
+                rotate([-90, 0, 0]) cylinder(h = led_body_len, d = led_d);
+    // meter body — hangs under the front panel; check it clears the pack top (pack top vs base_wall_h)
+    if (meter_on)
+        comp_block(ext_w - meter_x_in - meter_w, ext_h - meter_y_in - meter_h, base_wall_h - meter_depth,
+                   meter_w, meter_h, meter_depth, [0.55, 0.35, 0.65]);
 }
 
 module base() {
@@ -366,8 +410,22 @@ module cover_grill() {   // bottom half of the panel
     len = ext_w - 2*grill_marg;
     for (y = ys) translate([ext_w/2, y, -1]) zslot(len, grill_slot, cover_t + 2);
 }
-module cover_mono()  // one quiet hat, debossed, upper area
-    translate([ext_w * 0.62, ext_h * 0.80, -0.01]) linear_extrude(mono_sink) monotile2d();
+module cover_mono()  // one quiet hat, debossed; upper corner away from the meter window
+    translate([ext_w * 0.78, ext_h * 0.885, -0.01]) linear_extrude(mono_sink) rotate([0, 0, -90]) monotile2d();
+
+// rectangular meter / display window, cut SQUARE through the panel. With the LEFT/RIGHT assembly
+// flip, this print frame maps straight to the assembled view, so X is from the DC-side (left) edge
+// and Y down from the top edge.
+module cover_meter()
+    translate([meter_x_in + meter_w/2, ext_h - meter_y_in - meter_h/2, -1])
+        linear_extrude(cover_t + 2) square([meter_w, meter_h], center = true);
+
+// vertical column of relocated LED holes, outboard of the meter (toward the DC-side edge),
+// reading top-down from the top edge.
+module cover_leds()
+    for (i = [0 : cover_led_n - 1])
+        translate([cover_led_x, ext_h - cover_led_y1 - i*cover_led_pitch, -1])
+            cylinder(h = cover_t + 2, d = cover_led_d);
 
 module cover() {
     difference() {
@@ -378,6 +436,8 @@ module cover() {
         }
         cover_grill();
         cover_mono();
+        if (meter_on)     cover_meter();
+        if (cover_led_on) cover_leds();
     }
 }
 
@@ -404,8 +464,9 @@ else if (part == "cover") mir() cover();
 else if (part == "assembly") {
     color("Gainsboro") mir() base();
     if (show_components) mir() components();   // block stand-ins, seated in place, flipped with the base
-    // flip the (panel-down) cover onto the base front
-    color("LightSteelBlue", 0.6) translate([0, ext_h, base_wall_h + cover_t]) rotate([180, 0, 0]) mir() cover();
+    // flip the (panel-down) cover LEFT/RIGHT (about its long Y axis) onto the base front — this is
+    // how it is assembled, so cover cutouts placed on the DC side land by the DC after the flip
+    color("LightSteelBlue", 0.6) translate([ext_w, 0, base_wall_h + cover_t]) rotate([0, 180, 0]) mir() cover();
 }
 else {   // "all" -- side by side
     mir() base();
