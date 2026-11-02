@@ -3,9 +3,10 @@
 // Two printed parts (export one at a time with -D part="..."):
 //   * base  — a back plate with four raised sides that screws to the wall (4 corner
 //             holes). Top & bottom sides fully grilled; the LEFT side grilled over its
-//             bottom half (the RIGHT side is kept solid for a fuse carrier). The right
-//             side carries a panel DC socket at the top, 6 DC-out lead holes below it,
-//             and the outline of a fuse-carrier standoff block lower down; the top side
+//             bottom half (the RIGHT side is kept solid, to back an optional external fuse
+//             carrier). The right side carries a panel DC socket at the top, 6 DC-out lead
+//             holes below it, and — only with fuse_holder_external — the mounting holes +
+//             feed slot + outline of a fuse-carrier standoff block lower down; the top side
 //             carries 3 panel-mount LEDs. Interior "furniture" (no full dividers): corner
 //             brackets that grip a 4s5p 18650 pack on one side, side-grip walls +
 //             standoffs for a BMS, and four screw posts for a power board above it.
@@ -73,8 +74,12 @@ led_n      = 2;
 led_offset = 24;                // first (rightmost) LED centre, measured in from the right (ext_w) edge
 led_pitch  = 24;                // LED centre-to-centre; the rest step left from the first
 
-// === Fuse carrier (standoff block mounted against the RIGHT wall; outline on the wall's inner face) ===
-fuse_on        = true;
+// === Fuse protection ===
+// Default is INTERNAL inline fuses in the wiring (nothing printed). Set fuse_holder_external
+// true to instead fit an external standoff fuse carrier on the OUTSIDE of the solid RIGHT wall:
+// that adds the 2 mounting-bolt through-holes + lead-feed slot, the wall outline, and the block
+// stand-in in the assembly view. The dimensions below only apply when it is on.
+fuse_holder_external = false;
 fuse_block_len = 94;                        // along the wall (Y)
 fuse_block_w   = 40;                        // up the wall (Z)
 fuse_block_y   = 80;                        // centre Y on the wall (below the lead holes)
@@ -203,7 +208,7 @@ module base_apertures() {
     for (i = [0 : led_n - 1])
         translate([ext_w - led_offset - i * led_pitch, ext_h - wall - 1, zc]) rotate([-90, 0, 0]) cylinder(h = wall + 2, d = led_d);
     // RIGHT wall: fuse-carrier mounting-bolt holes (2, along Y) + lead feed-through slot, centred on the block
-    if (fuse_on) {
+    if (fuse_holder_external) {
         for (s = [-1, 1])
             translate([ext_w - wall - 1, fuse_block_y + s*fuse_screw_cc/2, fuse_block_z])
                 rotate([0, 90, 0]) cylinder(h = wall + 2, d = fuse_screw_d);
@@ -288,7 +293,7 @@ module placement_outlines() {
     footprint_outline((pack_x0 + pack_x1)/2, (pack_y0 + pack_y1)/2, pack_w, pack_y1 - pack_y0);      // 18650 pack
     footprint_outline(rcol_cx, wall + bms_lift + bms_h/2, bms_w, bms_h);                              // BMS
     footprint_outline(rcol_cx, wall + bms_lift + bms_h + pb_gap_bms + pb_h/2, pb_w, pb_h);            // power board
-    if (fuse_on) wall_outline_r(fuse_block_y, fuse_block_z, fuse_block_len, fuse_block_w);            // fuse carrier (on the right wall)
+    if (fuse_holder_external) wall_outline_r(fuse_block_y, fuse_block_z, fuse_block_len, fuse_block_w);   // external fuse carrier (on the right wall)
 }
 
 // --- mock component blocks (illustration only) ------------------------------
@@ -309,7 +314,7 @@ module components() {
                pb_w, pb_h, pb_body_h, [0.16, 0.52, 0.27]);
     // fuse carrier — mounts on the OUTSIDE of the solid RIGHT wall; its 2 bolts + the lead slot
     // pass through the wall. Block sits proud of the exterior face, aligned to the wall outline.
-    if (fuse_on)
+    if (fuse_holder_external)
         comp_block(ext_w, fuse_block_y - fuse_block_len/2, back_t + 1,
                    fuse_body_d, fuse_block_len, fuse_block_w, [0.88, 0.47, 0.11]);
     // DC socket — barrel poking in through the RIGHT wall

@@ -35,7 +35,7 @@ _Renders of the housing design. Photos of the finished unit to follow._
 
 | | |
 |---|---|
-| Output | 12.0 V DC regulated, 5 fused outputs (5.5 mm barrel) |
+| Output | 12.0 V DC regulated, 5 individually fused outputs (2 A, 2 A, 3 A, 3 A, 5 A; 5.5 mm barrel) |
 | Input | 24 V DC, 4 A (96 W) external adapter |
 | Battery | 20 × 18650 Li-ion, 4S5P, ~14.5 V nominal, ~17.5 Ah, ~254 Wh |
 | Switchover | Zero-time; output stays regulated across mains loss and return |
@@ -74,8 +74,8 @@ These come from the weakest component in each path, not from the module alone.
 | Output, on battery | **≤ 100 W continuous** (8.3 A) | UPS module |
 | Output, on mains, while charging | **≤ ~55 W continuous** | 24 V 4 A adapter (96 W) minus ~34 W charging |
 | Output, on mains, battery full | ≤ ~90 W | 24 V 4 A adapter |
-| Per-output current | Fuse rating, max 5 A; barrel leads 18 AWG | Output fuses / cabling |
-| Total output via fuse block | ≤ 10 A | Fuse block rating |
+| Per-output current | Fuse rating: 2 / 2 / 3 / 3 / 5 A | Output fuses (F2–F6) |
+| **Total output, all outputs combined** | **≤ 8.3 A continuous (100 W), 10 A peak** | UPS module. The output fuses add up to 15 A, so they are deliberately over-provisioned. Each fuse protects only its own branch, and the combined load must stay within the module rating (and within the adapter budget on mains). |
 | Battery discharge current | ~8.5 A at 100 W out and 12.4 V cutoff (~1.7 A/cell) | Load; pack fuse 10 A, BMS 15 A, cells 10 A each |
 | Battery charge current | **2.0 A** (~0.11C, 0.4 A/cell) | Setting (VR1) |
 | Charge voltage (charge ceiling) | **16.2 V** (4.05 V/cell, ~85% SoC); selectable 16.0–16.8 V | Setting (VR2), see [Charge ceiling](#charge-ceiling-state-of-charge) |
@@ -121,17 +121,21 @@ Real-world draw of network gear is usually well below adapter ratings. Measure y
      └─ Daly 4S BMS (B-/P-, balance leads)        └──────┬───────┘
                                                          │ VOUT 12 V / GND
                                                          ▼
-                     6-way fuse block (12 V only) ─► F2…F6 ─► 5.08 mm edge conn (+)
-                              UPS GND ──────────────────────► 5.08 mm edge conn (−)
-                                                                  │
-                                                                  ▼
-                                                    5 × 5.5 mm barrel outputs
+            VOUT+ ─► 5.08 mm edge conn (+, fan-out) ─┬─► [F2 2 A] ─► OUT1
+                                                     ├─► [F3 2 A] ─► OUT2
+                                                     ├─► [F4 3 A] ─► OUT3
+                                                     ├─► [F5 3 A] ─► OUT4
+                                                     └─► [F6 5 A] ─► OUT5
+            GND ───► 5.08 mm edge conn (−, fan-out) ───────────────► OUT1…OUT5 sleeves
+
+            All fuses F0–F6 are inline blade holders inside the housing.
 ```
 
 - **F0 (pack fuse)** is an inline holder inside the housing, on the pack positive between the BMS/pack side and the Anderson connector. Keeping it on the pack side means it protects the Anderson, the leads to the board and the board's battery input from a pack-fed short. The only unprotected conductor is the short lead from the pack to F0, so keep it as short as practical and well secured.
 - The **BMS** switches the pack negative (B- to cells, P- to the Anderson). It is a **common-port** type: charge and discharge share P-.
 - The **Anderson connector** is the battery service disconnect. Open it whenever you adjust charge voltage or work on the board.
-- **Fuse block:** all six slots share one common bus, so it carries **only the 12 V outputs** (F2–F6). The 24 V input fuse (F1) is a separate inline holder. Putting F1 in the block would connect 24 V straight to the 12 V outputs.
+- **Inline fusing throughout:** every fuse (F0 pack, F1 input, F2–F6 outputs) is an inline blade holder inside the housing. That's neater and more compact than a fuse block, and no routine user servicing is expected. Separate holders also mean the 24 V input and the 12 V outputs can never share a bus.
+- **Outputs are a menu, not a budget:** the five outputs are fused 2 / 2 / 3 / 3 / 5 A so each device can be plugged into a suitably rated output. The fuses total 15 A, which is more than the module's 8.3 A. The combined load is limited by the module and the adapter, not by the fuses (see [System limits](#system-limits-this-build)).
 
 ---
 
@@ -144,17 +148,16 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 | 1 | DC power supply 24 V 4 A / 5 A, 5.5/2.x barrel | £10.99 | Mains input. Must be ≥ 1 V above the charge voltage (≥ 17.8 V covers every ceiling up to 16.8 V). 4 A (96 W) covers ~55 W load while charging; use 5 A for heavier loads. | [AliExpress](https://www.aliexpress.com/item/1005007332397741.html) |
 | 1 | DC UPS power module, 12 V out, 15 A max input | £36.79 | Main board: charger, power path, buck-boost regulator, UVP, LEDs | [AliExpress](https://www.aliexpress.com/item/1005001636977344.html) |
 | 1 | Daly 4S 15 A BMS, 3.7 V Li-ion, common port, with balancing | £7.15 | Per-cell protection and passive balancing | [AliExpress](https://www.aliexpress.com/item/1005005995685641.html) |
-| 1 | Blade fuse block, 2-input 6-output, 10 A, 15 cm leads | £4.99 | **12 V outputs only** (F2–F6, one spare). All slots share a common bus, so it must not carry the 24 V input. | [AliExpress](https://www.aliexpress.com/item/1005010116130521.html) |
-| 1 | Inline blade fuse holder (F0, pack) | — | 10 A pack fuse, inside the housing between BMS/pack positive and the Anderson. Rated ≥ 10 A with ≥ 18 AWG leads. | — |
-| 1 | Inline blade fuse holder (F1, input) | — | 5 A, 24 V input between the panel jack and UPS Vin+ | [AliExpress](https://www.aliexpress.com/item/1005009796880476.html) |
-| n | DC blade fuses 1/2/3/5/10 A, 10 pcs | £0.93 | Name-brand recommended, with 1000 A DC interrupt rating, for the pack fuse | [AliExpress](https://www.aliexpress.com/item/4000832079230.html) |
+| 2 | Inline blade fuse holder, 16 AWG, 10 A (2-pack) | — | Used for F0 (pack, 10 A fuse) and one output | [Amazon](https://www.amazon.co.uk/dp/B0HG927H6S) |
+| 1 | Inline blade fuse holder set (5 pcs): 1 × 12 AWG 15–30 A, 4 × 16 AWG 10 A | — | 12 AWG holder for F1 (24 V input, 5 A fuse). 4 × 16 AWG holders for outputs. | [Amazon](https://www.amazon.co.uk/dp/B0DBPQBGBQ) |
+| n | DC blade fuses 2/3/5/10 A | £0.93 | F0 10 A, F1 5 A, F2–F6 2/2/3/3/5 A. Name-brand with 1000 A DC interrupt rating recommended for F0. | [AliExpress](https://www.aliexpress.com/item/4000832079230.html) |
 | 1 | DC 5.5/2.x barrel panel connector, 10 A, 15 cm | £1.37 | Mains adapter input jack | [AliExpress](https://www.aliexpress.com/item/1005007189485497.html) |
 | 5 | DC 5.5/2.x power leads, 18 AWG, 1.5 m | £3.26 | One per output. Match inner diameter (2.1 or 2.5 mm) to each device. 18 AWG is good to ~7 A. | [AliExpress](https://www.aliexpress.com/item/1005012145395888.html) |
 | 2 | 16 mm LED indicator, panel mount, 3–6 V | £1.35 | External status LEDs via J8 (e.g. input power, charging/fault). A smaller size may fit better. | [AliExpress](https://www.aliexpress.com/item/1005008299613973.html) |
 | 20 | LG MJ1 18650, 3500 mAh, 10 A | £2.81 | 4S5P, welded in a 10 × 2 honeycomb array | [Cell Supply](https://www.cellsupply.co.uk/lg-mj1-18650-battery) |
 | 1 | 2-core 18 AWG silicone tinned copper wire | £1.60 | Internal hookup | [AliExpress](https://www.aliexpress.com/item/1005012526819544.html) |
 | 1 | Anderson 30 A connector | £2.51 | Pack-to-board connection and safety disconnect | [AliExpress](https://www.aliexpress.com/item/1005006226687227.html) |
-| 2 | 5-pin pluggable edge connector, 5.08 mm, 15 A | £0.88 | 1 × UPS negative fan-out to 5 outputs; 1 × fused positives to 5 outputs | [AliExpress](https://www.aliexpress.com/item/1005009224192771.html) |
+| 2 | 5-pin pluggable edge connector, 5.08 mm, 15 A | £0.88 | 1 × UPS VOUT− fan-out to 5 outputs; 1 × UPS VOUT+ fan-out to the 5 output fuses | [AliExpress](https://www.aliexpress.com/item/1005009224192771.html) |
 | 1 | 3-pin 2.54 mm JST connector, PCB + lead | — | Detachable LED harness | — |
 | — | Nickel strip, 10 mm × 0.15 mm | — | Cell interconnects and wire tabs | — |
 | — | Spot welder | — | — | — |
@@ -162,11 +165,10 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 | — | Heat-resistant insulating tape, packaging | — | Pack wrap | — |
 | 4 | M4 self-tapping screws | — | UPS module to base | — |
 | 4 | M4 self-tapping screws | — | Wall mounting | — |
-| 2 | M4 × 12 mm machine screws | — | Fuse holder | — |
 | 1 | 3D-printed housing (base + cover), PETG | — | See below | — |
 | 1 + 2 | 3D-printed cell harness: 1 footer + 2 spacers, PETG | — | See below | — |
 
-**Approximate total:** ~£145 (parts listed with prices, excluding printing, tools and consumables).
+**Approximate total:** ~£140 plus fuse holders (parts listed with prices, excluding printing, tools and consumables).
 
 ---
 
@@ -176,7 +178,7 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 |---|---|
 | `housing_ups_12vdc.scad` | Parametric OpenSCAD source for the enclosure |
 | `housing_ups_12vdc.3mf` | Print project for the enclosure |
-| `housing_ups_12vdc_base.stl` | Enclosure base: UPS module, fuse block, connectors, pack |
+| `housing_ups_12vdc_base.stl` | Enclosure base: UPS module, inline fuse holders, connectors, pack |
 | `housing_ups_12vdc_cover.stl` | Enclosure cover |
 | `housing_ups_12vdc_assembly.png` | Assembly render |
 | `housing_ups_12vdc_plan.png` | Top-down plan render |
@@ -189,8 +191,6 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 - **Spacers (×2):** slid over the cells, one about 10 mm from the top and one about 10 mm from the bottom. They fix cell spacing and make the pack rigid independently of the welds, so handling and mounting loads aren't taken through the weld nuggets.
 
 **Material:** all parts are printed in **PETG**. PLA softens at ~55–60 °C, and the enclosure sits next to a pack and a converter for years. No common printed plastic is fire-rated. Consider where the unit is mounted (see [Safety notes](#safety-notes)).
-
-> The housing SCAD/STL is being revised to mount the inline fuse holders (F0, F1); the renders may not show them yet.
 
 ---
 
@@ -220,22 +220,37 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 - Use a name-brand DC blade fuse. Voltage rating ≥ 24 V DC (pack max is 16.8 V), and interrupt rating ~1000 A DC.
 
 ### 5. Fusing
-- **F1 (24 V input): 5 A in an inline holder** between the adapter jack and UPS Vin+. That suits a 4 A adapter; a 10 A fuse here would protect only the wiring.
-- **The 6-way fuse block carries 12 V outputs only.** Its slots share a common bus, so the 24 V input must never go through it. Feed the block's input lead from UPS VOUT.
-- F2–F6 (12 V outputs): size to each device, roughly 1.5–2× its normal draw and ≤ its adapter rating:
+All fuses are inline blade holders inside the housing.
 
-| Output | Example device | Fuse |
+| Fuse | Circuit | Fuse rating | Holder |
+|---|---|---|---|
+| F0 | Pack positive → Anderson | 10 A | 16 AWG, 10 A |
+| F1 | 24 V input: panel jack → UPS Vin+ | 5 A (suits the 4 A adapter) | 12 AWG, 15–30 A |
+| F2 | OUT1 | 2 A | 16 AWG, 10 A |
+| F3 | OUT2 | 2 A | 16 AWG, 10 A |
+| F4 | OUT3 | 3 A | 16 AWG, 10 A |
+| F5 | OUT4 | 3 A | 16 AWG, 10 A |
+| F6 | OUT5 | 5 A | 16 AWG, 10 A |
+
+The outputs are a choice of ratings: plug each device into an output whose fuse is roughly 1.5–2× its normal draw and no more than its original adapter rating. The output fuses total 15 A, but **the combined load must stay within 8.3 A continuous** (the module limit), and within ~55 W on mains while charging (the adapter limit). Keep peak loads in mind when adding devices.
+
+Example allocation (this installation):
+
+| Output | Fuse | Device |
 |---|---|---|
-| 1 | CTS HES-3106-PLUS (12 V 1.5 A adapter) | 2 A |
-| 2 | MikroTik PowerBox Pro (no PoE out) | 3 A (5 A if feeding PoE devices) |
-| 3 | Sagemcom Wi-Fi Hub 2 | 3 A |
-| 4–5 | Spare | as required |
+| OUT1 | 2 A | CTS HES-3106-PLUS (12 V 1.5 A adapter) |
+| OUT2 | 2 A | Spare |
+| OUT3 | 3 A | Sagemcom Wi-Fi Hub 2 |
+| OUT4 | 3 A | MikroTik PowerBox Pro |
+| OUT5 | 5 A | Spare |
+
+> **MikroTik PowerBox PoE-out:** the PowerBox's PoE-out ports (ether2–5) pass through whatever voltage the PowerBox is running from. In this installation one PoE-out port feeds an annex Wi-Fi AP. That AP is non-essential and is **not budgeted on the UPS**; it's allowed to drop during an outage, because the primary AP (Sagemcom) stays up. Check what actually happens to it when the PowerBox runs from the UPS's 12 V. An AP that accepts 12 V passive PoE would keep running and draw from the UPS (and through the 3 A fuse). One that needs 24 V+ will drop out or reboot-loop. If it does keep running, either budget for it or disable PoE-out on that port during outages (e.g. a RouterOS script on the PowerBox's voltage monitor).
 
 ### 6. Wiring
-- 18 AWG silicone throughout. Battery-side current is ≤ ~3 A normally and ≤ ~8.5 A worst case.
-- Adapter jack → F1 (inline) → UPS **Vin+**. Jack negative → UPS input **GND**.
-- UPS **VOUT** → fuse block input → F2–F6 → positive edge connector → barrel centre pins.
-- UPS output **GND** → negative edge connector → barrel sleeves.
+- 18 AWG silicone for internal hookup. The fuse holders' own 16 / 12 AWG pigtails are fine to join to it. Battery-side current is ≤ ~3 A normally and ≤ ~8.5 A worst case.
+- Adapter jack → F1 → UPS **Vin+**. Jack negative → UPS input **GND**.
+- UPS **VOUT+** → positive edge connector (fan-out) → F2–F6 → barrel centre pins.
+- UPS output **GND** → negative edge connector (fan-out) → barrel sleeves.
 - Pack (via F0 and Anderson) → UPS **BAT** terminals (J1).
 - LEDs → J8 via the 3-pin JST lead (J8 carries LED1–LED3).
 
@@ -285,7 +300,7 @@ SoC figures are approximate for LG MJ1. They depend on chemistry, temperature an
 
 ## Commissioning and testing
 
-1. **Pre-power checks:** pack, BMS and balance leads verified (Build steps 2–3). Confirm with a continuity tester that there's no path from the 24 V input (jack, F1, Vin+) to the 12 V output bus. Anderson open. No loads connected.
+1. **Pre-power checks:** pack, BMS and balance leads verified (Build steps 2–3). Confirm with a continuity tester that there's no path from the 24 V input (jack, F1, Vin+) to the 12 V outputs, and that each output's fuse is in its positive lead. Anderson open. No loads connected.
 2. **Adapter only:** connect the 24 V adapter. LED1 (blue, input) lights.
 3. **Set the charge voltage** (VR2) to the chosen ceiling (default 16.2 V) as the peak at the BAT terminals.
 4. **Set the thresholds:** TP4 = 3.10 V (VR4), TP3 = 3.40 V (VR3).
@@ -315,7 +330,7 @@ SoC figures are approximate for LG MJ1. They depend on chemistry, temperature an
 
 ## Safety notes
 
-- **Fusing:** every source is fused: pack (F0, 10 A, inline), adapter input (F1, 5 A, inline), each output (F2–F6, fuse block). The pack fuse is the critical one. A 254 Wh pack can source hundreds of amps into a short.
+- **Fusing:** every source is fused: pack (F0, 10 A, inline), adapter input (F1, 5 A, inline), each output (F2–F6, 2/2/3/3/5 A), all inline inside the housing. The pack fuse is the critical one. A 254 Wh pack can source hundreds of amps into a short.
 - **Disconnect** the battery (Anderson) before any work on the board, wiring or settings.
 - **Never charge below 0 °C.** Lithium plating causes permanent damage and internal shorts. Don't install in unheated outbuildings or lofts without accounting for this.
 - **Location:** mount on a non-combustible surface, away from soft furnishings, with airflow around the enclosure. A printed enclosure provides no fire containment.
@@ -337,4 +352,4 @@ SoC figures are approximate for LG MJ1. They depend on chemistry, temperature an
 
 ## Licence
 
-CC BY-NC-SA 4.0
+_TBD — add a `LICENSE` file (e.g. CERN-OHL-P / CC-BY-SA for hardware, MIT for code)._
