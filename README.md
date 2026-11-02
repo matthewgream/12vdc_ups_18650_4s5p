@@ -344,11 +344,11 @@ SoC figures are approximate for LG MJ1. They depend on chemistry, temperature an
 
 ## Build photos
 
-### Initial bench test
+### Initial bench test - battery/mains supply/charge cycles
 
 <a href="images/housing_ups_12vdc_bench_test.jpg"><img src="images/housing_ups_12vdc_bench_test.jpg" alt="Bench test of the UPS module, pack and wiring before final assembly" width="800"></a>
 
-_Bench test before final assembly._ Confirm power is supplied while plugged (mains vs. transformer) and unplugged (battery). Allow battery to supply and drain down sufficiently below threshold, then re-establish power to charge and monitor charging and completion. Measure charged volatge. Repeat with drain down to critical limits.
+_Bench test before final assembly._ Confirm power is supplied while plugged (mains vs. transformer) and unplugged (battery). Allow battery to supply and drain down sufficiently below threshold, then re-establish power to charge and monitor charging and completion. Measure charged voltage. Repeat with drain down to critical limits.
 
 ---
 
