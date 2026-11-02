@@ -179,16 +179,16 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 | File | Description |
 |---|---|
 | `housing_ups_12vdc.scad` | Parametric OpenSCAD source for the enclosure |
-| `housing_ups_12vdc.3mf` | Print project for the enclosure |
-| `housing_ups_12vdc_base.stl` | Enclosure base: UPS module, inline fuse holders, connectors, pack |
-| `housing_ups_12vdc_cover.stl` | Enclosure cover |
-| `housing_ups_12vdc_assembly.png` | Assembly render |
-| `housing_ups_12vdc_plan.png` | Top-down plan render |
+| `housing_ups_12vdc.3mf` | Print project for the enclosure (Bambu Studio) |
+| `housing_ups_12vdc_base.stl` | (Generated) Enclosure base: UPS module, BMS, battery pack, wiring  |
+| `housing_ups_12vdc_cover.stl` | (Generated) Enclosure cover |
+| `housing_ups_12vdc_assembly.png` | (Generated) Assembly render |
+| `housing_ups_12vdc_plan.png` | (Generated) Top-down plan render |
 | `images/` | Build photos |
 | `Makefile` | Build targets for the generated files |
 | `18650-cell-pack-harness.scad` | Parametric OpenSCAD source for the cell harness |
-| `18650-cell-pack-harness_footer.stl` | Cell footer: welding jig |
-| `18650-cell-pack-harness_spacer.stl` | Cell spacer: structural (print 2) |
+| `18650-cell-pack-harness_footer.stl` | (Generated) Cell footer: welding jig |
+| `18650-cell-pack-harness_spacer.stl` | (Generated) Cell spacer: structural |
 
 **Cell harness.** The honeycomb cells don't butt against each other, so the welded nickel shouldn't be the only thing holding the pack in shape.
 - **Footer:** the cells stand in it during welding, which holds them square and level so the strips sit flat across all ends.
