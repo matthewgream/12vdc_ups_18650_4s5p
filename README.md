@@ -8,7 +8,7 @@ It's built around an off-the-shelf DC UPS module that does the charging, power-p
 |---|---|
 | ![Assembly view](housing_ups_12vdc_assembly.png) | ![Plan view](housing_ups_12vdc_plan.png) |
 
-_Renders of the housing design. Photos of the finished unit to follow._
+_Renders of the housing design. See [Build photos](#build-photos) for the real thing._
 
 > ⚠️ **Lithium-ion packs store a lot of energy (~250 Wh here) and can cause fires if built or used incorrectly.** This is a record of one build, not a certified product. Build at your own risk, and only if you are comfortable with spot-welding cells, pack wiring and DC fusing.
 
@@ -27,6 +27,7 @@ _Renders of the housing design. Photos of the finished unit to follow._
 - [Commissioning and testing](#commissioning-and-testing)
 - [Operation and maintenance](#operation-and-maintenance)
 - [Safety notes](#safety-notes)
+- [Build photos](#build-photos)
 - [Design rationale](#design-rationale)
 
 ---
@@ -182,6 +183,8 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 | `housing_ups_12vdc_cover.stl` | Enclosure cover |
 | `housing_ups_12vdc_assembly.png` | Assembly render |
 | `housing_ups_12vdc_plan.png` | Top-down plan render |
+| `images/` | Build photos |
+| `Makefile` | Build targets for the generated files |
 | `18650-cell-pack-harness.scad` | Parametric OpenSCAD source for the cell harness |
 | `18650-cell-pack-harness_footer.stl` | Cell footer: welding jig |
 | `18650-cell-pack-harness_spacer.stl` | Cell spacer: structural (print 2) |
@@ -339,6 +342,18 @@ SoC figures are approximate for LG MJ1. They depend on chemistry, temperature an
 
 ---
 
+## Build photos
+
+Photos are in [`images/`](images/) and will be added as the build progresses.
+
+### Bench test
+
+<a href="images/housing_ups_12vdc_bench_test.jpg"><img src="images/housing_ups_12vdc_bench_test.jpg" alt="Bench test of the UPS module, pack and wiring before final assembly" width="800"></a>
+
+_Bench test before final assembly._
+
+---
+
 ## Design rationale
 
 - **Integrated UPS module vs separate charger + buck:** an earlier candidate module (UPS-0528-11) passes the input voltage straight through to the output on mains (24 V) and outputs unregulated battery voltage on outage. It would have needed a separate wide-input buck converter and a low-voltage disconnect. The chosen module integrates a 100 W buck-boost regulator and adjustable UVP with restart hysteresis.
@@ -352,5 +367,4 @@ SoC figures are approximate for LG MJ1. They depend on chemistry, temperature an
 
 ## Licence
 
-CC BY-NC-SA 4.0
-
+See [`LICENSE`](LICENSE).
