@@ -178,15 +178,15 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 
 | File | Description |
 |---|---|
-| `housing_ups_12vdc.scad` | Parametric OpenSCAD source for the enclosure |
-| `housing_ups_12vdc.3mf` | Print project for the enclosure (Bambu Studio) |
+| `housing_ups_12vdc.3mf` | Print project for the enclosure and harness (Bambu Studio) |
+| `housing_ups_12vdc.scad` | (Source) Parametric OpenSCAD source for the enclosure |
 | `housing_ups_12vdc_base.stl` | (Generated) Enclosure base: UPS module, BMS, battery pack, wiring  |
 | `housing_ups_12vdc_cover.stl` | (Generated) Enclosure cover |
 | `housing_ups_12vdc_assembly.png` | (Generated) Assembly render |
 | `housing_ups_12vdc_plan.png` | (Generated) Top-down plan render |
 | `images/` | Build photos |
 | `Makefile` | Build targets for the generated files |
-| `18650-cell-pack-harness.scad` | Parametric OpenSCAD source for the cell harness |
+| `18650-cell-pack-harness.scad` | (Source) Parametric OpenSCAD source for the harness |
 | `18650-cell-pack-harness_footer.stl` | (Generated) Cell footer: welding jig |
 | `18650-cell-pack-harness_spacer.stl` | (Generated) Cell spacer: structural |
 
