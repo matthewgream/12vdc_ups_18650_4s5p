@@ -72,20 +72,20 @@ These come from the weakest component in each path, not from the module alone.
 | Parameter | Limit | Set by |
 |---|---|---|
 | Output, on battery | **≤ 100 W continuous** (8.3 A) | UPS module |
-| Output, on mains, while charging | **≤ ~50 W continuous** | 24 V 4 A adapter (96 W) minus ~43 W charging |
+| Output, on mains, while charging | **≤ ~55 W continuous** | 24 V 4 A adapter (96 W) minus ~34 W charging |
 | Output, on mains, battery full | ≤ ~90 W | 24 V 4 A adapter |
 | Per-output current | Fuse rating, max 5 A; barrel leads 18 AWG | Output fuses / cabling |
 | Total output via fuse block | ≤ 10 A | Fuse block rating |
 | Battery discharge current | ~8.5 A at 100 W out and 12.4 V cutoff (~1.7 A/cell) | Load; pack fuse 10 A, BMS 15 A, cells 10 A each |
-| Battery charge current | **2.5 A** (0.14C, 0.5 A/cell) | Setting (VR1) |
-| Charge voltage | **16.4 V** (4.10 V/cell) | Setting (VR2) |
+| Battery charge current | **2.0 A** (~0.11C, 0.4 A/cell) | Setting (VR1) |
+| Charge voltage (charge ceiling) | **16.2 V** (4.05 V/cell, ~85% SoC); selectable 16.0–16.8 V | Setting (VR2), see [Charge ceiling](#charge-ceiling-state-of-charge) |
 | Undervoltage cutoff | **12.4 V** (3.10 V/cell) | Setting (VR4) |
 | Restart threshold | **13.6 V** (3.40 V/cell) | Setting (VR3) |
 | Cell charge temperature | 0–45 °C | Li-ion chemistry; **do not charge below 0 °C** |
 | Cell discharge temperature | −20 to +60 °C | Li-ion chemistry |
 | Enclosure ambient | Indoor, dry, ideally 10–30 °C | Housing material and cell life |
 
-> **Note on the adapter:** the module doesn't appear to throttle charge current to protect the adapter. If your loads exceed ~50 W, use a **24 V 5 A (120 W)** or larger adapter, or reduce the charge current.
+> **Note on the adapter:** the module doesn't appear to throttle charge current to protect the adapter. If your loads exceed ~55 W, use a **24 V 5 A (120 W)** or larger adapter, or reduce the charge current.
 
 > **Note on "10 A":** the module's continuous rating is **8.3 A at 12 V**, with 10 A as a peak. Size loads accordingly.
 
@@ -93,9 +93,9 @@ These come from the weakest component in each path, not from the module alone.
 
 ## Runtime
 
-Usable energy is about **195 Wh** at the output. That's 254 Wh nominal, less ~10% for charging to 4.10 V/cell rather than 4.20 V, a little for the 3.10 V/cell cutoff, and ~5% conversion loss.
+At the default 85% charge ceiling, usable energy is about **195 Wh** at the output. That's 254 Wh nominal, less ~15% unused at the top, a few percent below the 3.10 V/cell cutoff, and ~5% conversion loss. For other ceilings see [Charge ceiling](#charge-ceiling-state-of-charge).
 
-| Load | Approx. runtime |
+| Load | Approx. runtime (85% ceiling) |
 |---|---|
 | 10 W | ~19 h |
 | 20 W | ~10 h |
@@ -128,7 +128,7 @@ Real-world draw of network gear is usually well below adapter ratings. Measure y
                                                     5 × 5.5 mm barrel outputs
 ```
 
-- **F0 (pack fuse)** sits on the pack positive, as close to the cells as practical, upstream of the Anderson connector. It protects the pack leads, BMS, connector and board input from a pack-fed short.
+- **F0 (pack fuse)** is an inline holder inside the housing, on the pack positive between the BMS/pack side and the Anderson connector. Keeping it on the pack side means it protects the Anderson, the leads to the board and the board's battery input from a pack-fed short. The only unprotected conductor is the short lead from the pack to F0, so keep it as short as practical and well secured.
 - The **BMS** switches the pack negative (B- to cells, P- to the Anderson). It is a **common-port** type: charge and discharge share P-.
 - The **Anderson connector** is the battery service disconnect. Open it whenever you adjust charge voltage or work on the board.
 - **Fuse block:** all six slots share one common bus, so it carries **only the 12 V outputs** (F2–F6). The 24 V input fuse (F1) is a separate inline holder. Putting F1 in the block would connect 24 V straight to the 12 V outputs.
@@ -141,11 +141,12 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 
 | Qty | Item | Price (ea.) | Notes | Link |
 |---|---|---|---|---|
-| 1 | DC power supply 24 V 4 A / 5 A, 5.5/2.x barrel | £10.99 | Mains input. Must be ≥ 17.4 V (1 V above charge voltage). 4 A (96 W) covers ~50 W load while charging; use 5 A for heavier loads. | [AliExpress](https://www.aliexpress.com/item/1005007332397741.html) |
+| 1 | DC power supply 24 V 4 A / 5 A, 5.5/2.x barrel | £10.99 | Mains input. Must be ≥ 1 V above the charge voltage (≥ 17.8 V covers every ceiling up to 16.8 V). 4 A (96 W) covers ~55 W load while charging; use 5 A for heavier loads. | [AliExpress](https://www.aliexpress.com/item/1005007332397741.html) |
 | 1 | DC UPS power module, 12 V out, 15 A max input | £36.79 | Main board: charger, power path, buck-boost regulator, UVP, LEDs | [AliExpress](https://www.aliexpress.com/item/1005001636977344.html) |
 | 1 | Daly 4S 15 A BMS, 3.7 V Li-ion, common port, with balancing | £7.15 | Per-cell protection and passive balancing | [AliExpress](https://www.aliexpress.com/item/1005005995685641.html) |
 | 1 | Blade fuse block, 2-input 6-output, 10 A, 15 cm leads | £4.99 | **12 V outputs only** (F2–F6, one spare). All slots share a common bus, so it must not carry the 24 V input. | [AliExpress](https://www.aliexpress.com/item/1005010116130521.html) |
-| 2 | Inline blade fuse holder | — | F0 (pack positive, 10 A) and F1 (24 V input, 5 A). Rated ≥ 10 A with ≥ 18 AWG leads. | [AliExpress](https://www.aliexpress.com/item/1005009796880476.html) |
+| 1 | Inline blade fuse holder (F0, pack) | — | 10 A pack fuse, inside the housing between BMS/pack positive and the Anderson. Rated ≥ 10 A with ≥ 18 AWG leads. | — |
+| 1 | Inline blade fuse holder (F1, input) | — | 5 A, 24 V input between the panel jack and UPS Vin+ | [AliExpress](https://www.aliexpress.com/item/1005009796880476.html) |
 | n | DC blade fuses 1/2/3/5/10 A, 10 pcs | £0.93 | Name-brand recommended, with 1000 A DC interrupt rating, for the pack fuse | [AliExpress](https://www.aliexpress.com/item/4000832079230.html) |
 | 1 | DC 5.5/2.x barrel panel connector, 10 A, 15 cm | £1.37 | Mains adapter input jack | [AliExpress](https://www.aliexpress.com/item/1005007189485497.html) |
 | 5 | DC 5.5/2.x power leads, 18 AWG, 1.5 m | £3.26 | One per output. Match inner diameter (2.1 or 2.5 mm) to each device. 18 AWG is good to ~7 A. | [AliExpress](https://www.aliexpress.com/item/1005012145395888.html) |
@@ -206,7 +207,7 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 - Main leads: crimp 18 AWG to nickel tabs, then weld the tabs to the pack ends.
 - Balance leads: weld to B0 (pack −), B1, B2, B3 and B4 (pack +). **Before covering,** measure B0→B1, B1→B2 and so on in sequence. Each step must read one group's voltage (~3.6–3.7 V as received), and B0→B4 the full pack voltage.
 - Strain-relieve all leads so they can't flex at the weld.
-- Wrap in heat-resistant tape, leaving the pack fuse holder and Anderson connector outside the wrap.
+- Wrap in heat-resistant tape, leaving the balance connector, F0 holder and Anderson connector outside the wrap and accessible.
 
 ### 3. BMS (Daly 4S, common port)
 - Cells' negative → **B-**. BMS **P-** → Anderson negative.
@@ -214,7 +215,8 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 - Some Daly boards hold P- off until a charger voltage is applied. If you read 0 V at P-, connect the 24 V adapter once to wake it.
 
 ### 4. Pack fuse and disconnect
-- **F0: 10 A blade fuse** on the pack positive, in a sealed inline holder, as close to the cells as practical, then to the Anderson positive.
+- **F0: 10 A blade fuse** in an inline holder mounted inside the housing, wired from the pack positive to the Anderson positive. The fuse is on the pack side of the disconnect, so it protects the Anderson and everything downstream.
+- Keep the pack → F0 lead short and secured. It's the only conductor upstream of the fuse.
 - Use a name-brand DC blade fuse. Voltage rating ≥ 24 V DC (pack max is 16.8 V), and interrupt rating ~1000 A DC.
 
 ### 5. Fusing
@@ -247,17 +249,35 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 
 | Setting | Target | Adjust | How |
 |---|---|---|---|
-| Charge voltage | **16.4 V** (4.10 V/cell) | VR2 | **Battery disconnected.** Measure at the BAT terminals. The output pulses while detecting a battery; set the *peak* to 16.4 V. Counterclockwise raises. |
-| Charge current | **2.5 A** | VR1 | Battery connected and partly discharged, ammeter in series with BAT+. Counterclockwise raises. |
+| Charge voltage | **16.2 V** (4.05 V/cell, ~85%); see table below | VR2 | **Battery disconnected.** Measure at the BAT terminals. The output pulses while detecting a battery; set the *peak* to the target. Counterclockwise raises. |
+| Charge current | **2.0 A** | VR1 | Battery connected and partly discharged, ammeter in series with BAT+. Counterclockwise raises. |
 | Undervoltage cutoff (VUVP) | **12.4 V** | VR4 | VUVP = 4 × V(TP4) → TP4 = **3.10 V** |
 | Restart threshold (VSTART) | **13.6 V** | VR3 | VSTART = 4 × V(TP3) → TP3 = **3.40 V** |
 | Output voltage | **12.0 V** | VR5 | J5 closed, no loads connected, measure at output |
 
 Factory defaults are for 3S (12.6 V charge, 1 A, 9.0 V UVP, 9.6 V start, 12 V output). **Never connect a 4S pack before raising the charge voltage**, or it will charge incorrectly. And never adjust the charge voltage with any battery connected.
 
-Why these values:
-- **16.4 V / 4.10 V per cell:** a UPS pack sits at full charge almost permanently. Trading ~10% capacity for a lower float voltage substantially extends cell life.
-- **2.5 A:** gentle (0.5 A per cell). It recharges from empty in ~7–8 h and keeps total adapter load within 96 W.
+### Charge ceiling (state of charge)
+
+A UPS pack spends almost all its life sitting at its charge ceiling, so **calendar ageing at high state of charge, not cycling, is what wears it out.** Lowering the ceiling is the single most effective way to extend pack life. The module terminates charging at C/10 and does not float, so the pack charges to the ceiling and then rests there.
+
+| Ceiling (approx. SoC) | Per cell | Pack (set VR2) | Usable at output | Runtime @ 25 W | Longevity |
+|---|---|---|---|---|---|
+| 100% | 4.20 V | 16.8 V | ~230 Wh | ~9 h | Shortest. Only for a periodic top-balance. |
+| 95% | 4.15 V | 16.6 V | ~220 Wh | ~8.5 h | Modest gain |
+| 90% | 4.10 V | 16.4 V | ~205 Wh | ~8 h | Good |
+| **85% (default)** | **4.05 V** | **16.2 V** | **~195 Wh** | **~8 h** | **Very good** |
+| 80% | 4.00 V | 16.0 V | ~180 Wh | ~7 h | Best of these |
+
+SoC figures are approximate for LG MJ1. They depend on chemistry, temperature and where termination occurs, so treat them as ±5%.
+
+**Recommendation: 80–90%, default 85%.** This matches common practice in consumer devices: phones and laptops typically offer an 80–85% "battery protection" limit for devices left on charge. Below ~80% you give up runtime for diminishing longevity gain. Pick the lowest ceiling that still gives the runtime you need.
+
+> **Balancing at reduced ceilings:** passive balancers on many BMS boards only bleed cells near the top of charge. Check the balance start voltage on your Daly BMS (label or listing). If it's above your ceiling, the BMS will never balance. Check group voltages every 6–12 months. If they've drifted by more than ~0.03 V, do one top-balance: disconnect the battery, set VR2 to 16.8 V, reconnect, let it charge and rest a day, then set it back. Alternatively, balance with a hobby charger on the balance lead.
+
+### Why these values
+- **Charge ceiling 16.2 V (85%):** see above. Longevity is the priority for an always-on UPS.
+- **2.0 A:** gentle (0.4 A per cell, ~0.11C). Recharge time isn't critical. A full recharge from cutoff takes ~8–9 h, and total adapter load stays well within 96 W.
 - **12.4 V cutoff:** well above the BMS's own over-discharge trip, so the BMS is a backstop rather than the normal cutoff. Also little capacity is left below ~3.1 V/cell under load.
 - **13.6 V restart:** enough hysteresis that a rested pack recovering after cutoff doesn't make the output cycle on and off.
 
@@ -267,24 +287,25 @@ Why these values:
 
 1. **Pre-power checks:** pack, BMS and balance leads verified (Build steps 2–3). Confirm with a continuity tester that there's no path from the 24 V input (jack, F1, Vin+) to the 12 V output bus. Anderson open. No loads connected.
 2. **Adapter only:** connect the 24 V adapter. LED1 (blue, input) lights.
-3. **Set the charge voltage** (VR2) to 16.4 V peak at the BAT terminals.
+3. **Set the charge voltage** (VR2) to the chosen ceiling (default 16.2 V) as the peak at the BAT terminals.
 4. **Set the thresholds:** TP4 = 3.10 V (VR4), TP3 = 3.40 V (VR3).
 5. **Set the output:** J5 closed, J7 shorted. Set VOUT to 12.0 V (VR5). LED4 (output) lights.
 6. **Connect the battery:** close the Anderson. Wake the BMS if needed. Charging starts; LED3 (green) lights.
-7. **Set the charge current** (VR1) to 2.5 A with an ammeter in series. Do this with the pack partly discharged, or the reading won't be accurate.
+7. **Set the charge current** (VR1) to 2.0 A with an ammeter in series. Do this with the pack partly discharged, or the reading won't be accurate.
 8. **Switchover test:** connect a dummy or real load. Pull the adapter. VOUT must stay at 12.0 V with no reset of connected equipment. Restore the adapter and confirm charging resumes.
-9. **Full charge:** confirm termination (LED3 off, LED2 red on) at 16.4 V with current tapering to ~0.25 A.
-10. **Runtime / UVP test (recommended once):** run on battery under normal load until cutoff. Confirm the output switches off near 12.4 V pack voltage and the BMS has *not* tripped. Restore mains and confirm auto-restart and recharge.
-11. **Balance check:** after a full charge, measure each group. They should be within ~0.02 V.
+9. **Full charge:** confirm termination (LED3 off, LED2 red on) at the ceiling voltage, with current tapering to ~0.2 A.
+10. **Recharge behaviour:** after termination, run briefly on battery (pull the adapter for a few minutes under load), then restore it. Confirm charging restarts. The manual doesn't document the recharge threshold, so verify the pack is topped up after short outages and not only after long ones.
+11. **Runtime / UVP test (recommended once):** run on battery under normal load until cutoff. Confirm the output switches off near 12.4 V pack voltage and the BMS has *not* tripped. Restore mains and confirm auto-restart and recharge.
+12. **Balance check:** after a full charge, measure each group. They should be within ~0.02 V.
 
 ---
 
 ## Operation and maintenance
 
 - **Indicators:** LED1 blue = input present. LED3 green = charging; flashes when the battery is below VSTART, or flashes twice when it's below VUVP at start-up. LED2 red = charge complete. LED4 red = output on.
-- **After an outage,** the module recharges automatically. A full recharge from cutoff takes ~7–8 h at 2.5 A.
+- **After an outage,** the module recharges automatically. A full recharge from cutoff takes ~8–9 h at 2.0 A.
 - **Every 6–12 months:**
-  - Check group balance (pack within ~0.02 V).
+  - Check group balance (pack within ~0.02 V). Top-balance if needed (see [Charge ceiling](#charge-ceiling-state-of-charge)).
   - Check the enclosure for heat discolouration and the connectors for looseness.
   - Do a short discharge test to confirm runtime hasn't fallen significantly.
 - **Storage:** if the unit will be unpowered for weeks, store the pack at ~3.7–3.8 V/cell (~15 V) and open the Anderson to remove BMS and board standby drain.
@@ -309,7 +330,8 @@ Why these values:
 - **4S over 3S:** lower battery current and a near-continuous buck-mode regulator. 3S would also work with the module's factory settings at this load.
 - **5P:** ~8 h runtime for ~25 W of network equipment, with each cell working at < 0.5 A typical.
 - **Separate BMS:** the module only monitors total pack voltage. The Daly BMS adds per-cell over- and undervoltage protection, short-circuit protection and balancing.
-- **24 V adapter:** gives the 1 V headroom the step-down charger needs above 16.4 V. Lower-voltage adapters (19 V) would also work and reduce conversion spread slightly.
+- **Reduced charge ceiling and current:** an always-on UPS is limited by calendar ageing at high state of charge, and recharge time is rarely critical. So both are set for longevity rather than maximum runtime or fast recharge.
+- **24 V adapter:** gives the 1 V headroom the step-down charger needs above any charge ceiling up to 16.8 V. Lower-voltage adapters (19 V) would also work and reduce conversion spread slightly.
 
 ---
 

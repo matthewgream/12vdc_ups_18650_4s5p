@@ -14,8 +14,8 @@
 //             by 4 snap lugs that seat in holes in the base side walls. Release: push a
 //             lug in through its hole with a screwdriver and lift. Bottom half grilled.
 //
-// House style: AE logo embossed on a visible face of each part; one quiet einstein "hat"
-// monotile, debossed small on the cover. External vertical corners rounded.
+// House style: one quiet einstein "hat" monotile, debossed small on the cover. External
+// vertical corners rounded.
 //
 // Model orientation: the BASE is modelled back-down = print orientation. The COVER is
 // modelled panel-down = its print orientation (lip + lugs point up); "assembly" flips it.
@@ -66,7 +66,7 @@ dc_y        = ext_h - wall - 24;
 lead_d      = 5;                 // each DC-out lead = 18AWG 2-core + sheath (~5 mm); 6 of them
 lead_n      = 5;
 lead_pitch  = 10;                // lead-hole centre-to-centre
-lead_dc_gap = 20;                // from the DC socket down to the first (topmost) lead
+lead_dc_gap = 17.5;                // from the DC socket down to the first (topmost) lead
 lead_y0     = dc_y - lead_dc_gap;// topmost lead; the rest step DOWN by lead_pitch
 led_d      = 16;                // 3 panel LEDs through the TOP wall (big bezels)
 led_n      = 2;
@@ -145,11 +145,7 @@ outline_on = true;
 border_t   = 1;      // outline line thickness
 border_h   = 1;     // outline raised height
 
-// === Logo / monotile ===
-logo_file  = "ae_stencil_one.svg";
-logo_w     = 22;
-logo_sink  = 0.8;
-logo_raise = 0.6;
+// === Monotile ===
 mono_w     = 24;    // debossed hat width on the cover
 mono_sink  = 0.8;
 
@@ -163,9 +159,6 @@ module stadium2d(len, thick)
 module xslot(len, thick, ythr) rotate([90, 0, 0]) linear_extrude(ythr) stadium2d(len, thick);   // long X, thin Z, thru Y
 module yslot(len, thick, xthr) rotate([0, -90, 0]) linear_extrude(xthr) rotate([0, 0, 90]) stadium2d(len, thick); // long Y, thin Z, thru X
 module zslot(len, thick, zthr) linear_extrude(zthr) stadium2d(len, thick);                        // long X, thin Y, thru Z
-
-// AE logo as a 2D outline, sized to logo_w, "ae" reading upward (spun 90).
-module logo2d() resize([logo_w, 0, 0], auto = true) rotate([0, 0, 90]) import(logo_file, center = true);
 
 // einstein "hat" monotile, centred on its ink, sized to mono_w wide.
 module monotile2d()
@@ -298,11 +291,6 @@ module placement_outlines() {
     if (fuse_on) wall_outline_r(fuse_block_y, fuse_block_z, fuse_block_len, fuse_block_w);            // fuse carrier (on the right wall)
 }
 
-module base_logo() {   // on the LEFT wall outer face, upper (solid) half
-    translate([logo_sink - logo_raise, ext_h * 0.78, (back_t + base_wall_h)/2])
-        rotate([90, 0, -90]) linear_extrude(logo_sink + logo_raise) logo2d();
-}
-
 // --- mock component blocks (illustration only) ------------------------------
 // Each block is placed in the model frame exactly where its furniture seats it, so wrapping
 // components() in the same mir() as the base keeps every part aligned after the L<->R flip.
@@ -373,8 +361,6 @@ module cover_grill() {   // bottom half of the panel
     len = ext_w - 2*grill_marg;
     for (y = ys) translate([ext_w/2, y, -1]) zslot(len, grill_slot, cover_t + 2);
 }
-module cover_logo()  // AE on the panel front face (upper half), debossed (prints on the bed side)
-    translate([ext_w * 0.32, ext_h * 0.72, -0.01]) linear_extrude(logo_sink) logo2d();
 module cover_mono()  // one quiet hat, debossed, upper area
     translate([ext_w * 0.62, ext_h * 0.80, -0.01]) linear_extrude(mono_sink) monotile2d();
 
