@@ -2,7 +2,13 @@
 
 A compact DC uninterruptible power supply that delivers a regulated **12 V** to network equipment (fibre CPE, router, Wi-Fi hub) from a 24 V mains adapter, with seamless switchover to a **4S5P 18650 lithium-ion pack** when mains fails.
 
-It's built around an off-the-shelf DC UPS module that does the charging, power-path switching, buck-boost regulation and battery undervoltage cutoff. Around it sit a balancing BMS, per-output fusing, and a 3D-printed housing and cell harness (OpenSCAD sources included).
+It's built around an off-the-shelf DC UPS module that does the charging, power-path switching, buck-boost regulation and battery undervoltage cutoff. Around it sit a balancing BMS, per-output fusing, and a 3D-printed PETG housing and cell harness (OpenSCAD sources included).
+
+| Assembly | Plan |
+|---|---|
+| ![Assembly view](housing_ups_12vdc_assembly.png) | ![Plan view](housing_ups_12vdc_plan.png) |
+
+_Renders of the housing design. Photos of the finished unit to follow._
 
 > ⚠️ **Lithium-ion packs store a lot of energy (~250 Wh here) and can cause fires if built or used incorrectly.** This is a record of one build, not a certified product. Build at your own risk, and only if you are comfortable with spot-welding cells, pack wiring and DC fusing.
 
@@ -105,17 +111,17 @@ Real-world draw of network gear is usually well below adapter ratings. Measure y
 ## Architecture
 
 ```
- 230 VAC ──► 24 V 4 A PSU ──► panel jack ──► [F1 5 A] ──► UPS VIN+ / GND
+ 230 VAC ──► 24 V 4 A PSU ──► panel jack ──► [F1 5 A, inline] ──► UPS VIN+ / GND
                                                          │
                                                   ┌──────┴───────┐
                                                   │  UPS module  │  charge (CC/CV, buck)
                                                   │              │  power path (zero-time)
-  4S5P pack ─► [F0 10 A] ─► Anderson SB/PP ─► BAT │              │  buck-boost 12.0 V out
+  4S5P pack ─► [F0 10 A, inline] ─► Anderson ─► BAT │              │  buck-boost 12.0 V out
      │                          ▲                 │              │  UVP / restart
      └─ Daly 4S BMS (B-/P-, balance leads)        └──────┬───────┘
                                                          │ VOUT 12 V / GND
                                                          ▼
-                              fuse block (12 V bus) ─► F2…F6 ─► 5.08 mm edge conn (+)
+                     6-way fuse block (12 V only) ─► F2…F6 ─► 5.08 mm edge conn (+)
                               UPS GND ──────────────────────► 5.08 mm edge conn (−)
                                                                   │
                                                                   ▼
@@ -125,7 +131,7 @@ Real-world draw of network gear is usually well below adapter ratings. Measure y
 - **F0 (pack fuse)** sits on the pack positive, as close to the cells as practical, upstream of the Anderson connector. It protects the pack leads, BMS, connector and board input from a pack-fed short.
 - The **BMS** switches the pack negative (B- to cells, P- to the Anderson). It is a **common-port** type: charge and discharge share P-.
 - The **Anderson connector** is the battery service disconnect. Open it whenever you adjust charge voltage or work on the board.
-- **Fuse block:** F1 (24 V input) must be on a bus that is **electrically isolated** from the 12 V output bus (F2–F6). See [Build](#build).
+- **Fuse block:** all six slots share one common bus, so it carries **only the 12 V outputs** (F2–F6). The 24 V input fuse (F1) is a separate inline holder. Putting F1 in the block would connect 24 V straight to the 12 V outputs.
 
 ---
 
@@ -138,9 +144,9 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 | 1 | DC power supply 24 V 4 A / 5 A, 5.5/2.x barrel | £10.99 | Mains input. Must be ≥ 17.4 V (1 V above charge voltage). 4 A (96 W) covers ~50 W load while charging; use 5 A for heavier loads. | [AliExpress](https://www.aliexpress.com/item/1005007332397741.html) |
 | 1 | DC UPS power module, 12 V out, 15 A max input | £36.79 | Main board: charger, power path, buck-boost regulator, UVP, LEDs | [AliExpress](https://www.aliexpress.com/item/1005001636977344.html) |
 | 1 | Daly 4S 15 A BMS, 3.7 V Li-ion, common port, with balancing | £7.15 | Per-cell protection and passive balancing | [AliExpress](https://www.aliexpress.com/item/1005005995685641.html) |
-| 1 | Blade fuse holder, 2-input 6-output, 10 A, 15 cm leads | £4.99 | 1 × input fuse (24 V), 5 × output fuses (12 V). **Input and output buses must be separate.** | [AliExpress](https://www.aliexpress.com/item/1005010116130521.html) |
+| 1 | Blade fuse block, 2-input 6-output, 10 A, 15 cm leads | £4.99 | **12 V outputs only** (F2–F6, one spare). All slots share a common bus, so it must not carry the 24 V input. | [AliExpress](https://www.aliexpress.com/item/1005010116130521.html) |
+| 2 | Inline blade fuse holder | — | F0 (pack positive, 10 A) and F1 (24 V input, 5 A). Rated ≥ 10 A with ≥ 18 AWG leads. | [AliExpress](https://www.aliexpress.com/item/1005009796880476.html) |
 | n | DC blade fuses 1/2/3/5/10 A, 10 pcs | £0.93 | Name-brand recommended, with 1000 A DC interrupt rating, for the pack fuse | [AliExpress](https://www.aliexpress.com/item/4000832079230.html) |
-| 1 | **Inline blade fuse holder, 10 A+, sealed** | — | **Pack fuse F0. Not yet in the original BOM; required.** | — |
 | 1 | DC 5.5/2.x barrel panel connector, 10 A, 15 cm | £1.37 | Mains adapter input jack | [AliExpress](https://www.aliexpress.com/item/1005007189485497.html) |
 | 5 | DC 5.5/2.x power leads, 18 AWG, 1.5 m | £3.26 | One per output. Match inner diameter (2.1 or 2.5 mm) to each device. 18 AWG is good to ~7 A. | [AliExpress](https://www.aliexpress.com/item/1005012145395888.html) |
 | 2 | 16 mm LED indicator, panel mount, 3–6 V | £1.35 | External status LEDs via J8 (e.g. input power, charging/fault). A smaller size may fit better. | [AliExpress](https://www.aliexpress.com/item/1005008299613973.html) |
@@ -151,11 +157,13 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 | 1 | 3-pin 2.54 mm JST connector, PCB + lead | — | Detachable LED harness | — |
 | — | Nickel strip, 10 mm × 0.15 mm | — | Cell interconnects and wire tabs | — |
 | — | Spot welder | — | — | — |
-| — | Insulating tape, fish-paper rings, packaging | — | Heat-resistant tape over pack; insulator rings on cell + terminals recommended | — |
+| 20 | Fish-paper insulator rings, 18650 | — | One per cell positive terminal | — |
+| — | Heat-resistant insulating tape, packaging | — | Pack wrap | — |
 | 4 | M4 self-tapping screws | — | UPS module to base | — |
 | 4 | M4 self-tapping screws | — | Wall mounting | — |
 | 2 | M4 × 12 mm machine screws | — | Fuse holder | — |
-| 1 | 3D-printed housing and cell harness | — | See below | — |
+| 1 | 3D-printed housing (base + cover), PETG | — | See below | — |
+| 1 + 2 | 3D-printed cell harness: 1 footer + 2 spacers, PETG | — | See below | — |
 
 **Approximate total:** ~£145 (parts listed with prices, excluding printing, tools and consumables).
 
@@ -169,11 +177,19 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 | `housing_ups_12vdc.3mf` | Print project for the enclosure |
 | `housing_ups_12vdc_base.stl` | Enclosure base: UPS module, fuse block, connectors, pack |
 | `housing_ups_12vdc_cover.stl` | Enclosure cover |
-| `18650-cell-pack-harness.scad` | Parametric OpenSCAD source for the cell holder |
-| `18650-cell-pack-harness_spacer.stl` | Cell spacer / holder |
-| `18650-cell-pack-harness_footer.stl` | Cell harness footer |
+| `housing_ups_12vdc_assembly.png` | Assembly render |
+| `housing_ups_12vdc_plan.png` | Top-down plan render |
+| `18650-cell-pack-harness.scad` | Parametric OpenSCAD source for the cell harness |
+| `18650-cell-pack-harness_footer.stl` | Cell footer: welding jig |
+| `18650-cell-pack-harness_spacer.stl` | Cell spacer: structural (print 2) |
 
-**Material:** PETG or ASA rather than PLA. PLA softens at ~55–60 °C and the enclosure lives somewhere warm for years. No common printed plastic is fire-rated. Consider where the unit is mounted (see [Safety notes](#safety-notes)).
+**Cell harness.** The honeycomb cells don't butt against each other, so the welded nickel shouldn't be the only thing holding the pack in shape.
+- **Footer:** the cells stand in it during welding, which holds them square and level so the strips sit flat across all ends.
+- **Spacers (×2):** slid over the cells, one about 10 mm from the top and one about 10 mm from the bottom. They fix cell spacing and make the pack rigid independently of the welds, so handling and mounting loads aren't taken through the weld nuggets.
+
+**Material:** all parts are printed in **PETG**. PLA softens at ~55–60 °C, and the enclosure sits next to a pack and a converter for years. No common printed plastic is fire-rated. Consider where the unit is mounted (see [Safety notes](#safety-notes)).
+
+> The housing SCAD/STL is being revised to mount the inline fuse holders (F0, F1); the renders may not show them yet.
 
 ---
 
@@ -185,7 +201,7 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 - Fit fish-paper insulator rings on positive terminals. The positive cap and the can (negative) are millimetres apart.
 
 ### 2. Pack (4S5P)
-- Assemble 20 cells in the harness as a 10 × 2 honeycomb, forming four parallel groups of five.
+- Stand the 20 cells in the **footer** as a 10 × 2 honeycomb, forming four parallel groups of five, and fit the two **spacers** (~10 mm from each end).
 - Spot-weld 0.15 mm nickel. Don't solder directly to cells.
 - Main leads: crimp 18 AWG to nickel tabs, then weld the tabs to the pack ends.
 - Balance leads: weld to B0 (pack −), B1, B2, B3 and B4 (pack +). **Before covering,** measure B0→B1, B1→B2 and so on in sequence. Each step must read one group's voltage (~3.6–3.7 V as received), and B0→B4 the full pack voltage.
@@ -201,9 +217,9 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 - **F0: 10 A blade fuse** on the pack positive, in a sealed inline holder, as close to the cells as practical, then to the Anderson positive.
 - Use a name-brand DC blade fuse. Voltage rating ≥ 24 V DC (pack max is 16.8 V), and interrupt rating ~1000 A DC.
 
-### 5. Fuse block
-- **Verify that the input slot (F1, 24 V) is on a bus electrically separate from the output slots (F2–F6, 12 V).** Check with a continuity tester before fitting fuses. If they share a bus, 24 V will be applied directly to the 12 V outputs.
-- F1 (24 V input): **5 A** suits a 4 A adapter; a 10 A fuse here protects only the wiring.
+### 5. Fusing
+- **F1 (24 V input): 5 A in an inline holder** between the adapter jack and UPS Vin+. That suits a 4 A adapter; a 10 A fuse here would protect only the wiring.
+- **The 6-way fuse block carries 12 V outputs only.** Its slots share a common bus, so the 24 V input must never go through it. Feed the block's input lead from UPS VOUT.
 - F2–F6 (12 V outputs): size to each device, roughly 1.5–2× its normal draw and ≤ its adapter rating:
 
 | Output | Example device | Fuse |
@@ -215,8 +231,8 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 
 ### 6. Wiring
 - 18 AWG silicone throughout. Battery-side current is ≤ ~3 A normally and ≤ ~8.5 A worst case.
-- Adapter jack → F1 → UPS **Vin+**. Jack negative → UPS input **GND**.
-- UPS **VOUT** → fuse block output bus → F2–F6 → positive edge connector → barrel centre pins.
+- Adapter jack → F1 (inline) → UPS **Vin+**. Jack negative → UPS input **GND**.
+- UPS **VOUT** → fuse block input → F2–F6 → positive edge connector → barrel centre pins.
 - UPS output **GND** → negative edge connector → barrel sleeves.
 - Pack (via F0 and Anderson) → UPS **BAT** terminals (J1).
 - LEDs → J8 via the 3-pin JST lead (J8 carries LED1–LED3).
@@ -249,7 +265,7 @@ Why these values:
 
 ## Commissioning and testing
 
-1. **Pre-power checks:** pack, BMS and balance leads verified (Build steps 2–3). Fuse block buses verified isolated. Anderson open. No loads connected.
+1. **Pre-power checks:** pack, BMS and balance leads verified (Build steps 2–3). Confirm with a continuity tester that there's no path from the 24 V input (jack, F1, Vin+) to the 12 V output bus. Anderson open. No loads connected.
 2. **Adapter only:** connect the 24 V adapter. LED1 (blue, input) lights.
 3. **Set the charge voltage** (VR2) to 16.4 V peak at the BAT terminals.
 4. **Set the thresholds:** TP4 = 3.10 V (VR4), TP3 = 3.40 V (VR3).
@@ -278,7 +294,7 @@ Why these values:
 
 ## Safety notes
 
-- **Fusing:** every source is fused: pack (F0, 10 A), adapter input (F1, 5 A), each output (F2–F6). The pack fuse is the critical one. A 254 Wh pack can source hundreds of amps into a short.
+- **Fusing:** every source is fused: pack (F0, 10 A, inline), adapter input (F1, 5 A, inline), each output (F2–F6, fuse block). The pack fuse is the critical one. A 254 Wh pack can source hundreds of amps into a short.
 - **Disconnect** the battery (Anderson) before any work on the board, wiring or settings.
 - **Never charge below 0 °C.** Lithium plating causes permanent damage and internal shorts. Don't install in unheated outbuildings or lofts without accounting for this.
 - **Location:** mount on a non-combustible surface, away from soft furnishings, with airflow around the enclosure. A printed enclosure provides no fire containment.
