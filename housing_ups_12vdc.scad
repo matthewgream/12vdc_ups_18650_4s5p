@@ -27,7 +27,7 @@
 //    Bump ext_w / ext_h / ext_d (≈135 x 235 x 48) and the furniture re-places itself.
 
 // === FLAGS ===
-part = "assembly";   // "base" | "cover" | "all" (apart) | "assembly" (cover on base)
+part = "all";   // "base" | "cover" | "all" (apart) | "assembly" (cover on base)
 mirror_lr = true;   // mirror the whole part left<->right: pack on the RIGHT, BMS/board/cables/DC/fuse on the LEFT
 show_components = true;   // in "assembly": draw colour block stand-ins for the fitted parts (illustration only, NOT printed)
 
@@ -51,7 +51,7 @@ lip_clear   = 0.4;   // lip-to-base-wall slide clearance
 lug_w       = 12;    // lug width (along the wall)
 lug_t       = 2.5;     // lug height along Z (the catch depth)
 lug_from_rim = 2.5;    // lug band, measured in from the cover rim (where it catches the wall hole)
-lug_ys      = [ext_h * 0.10, ext_h * 0.90];   // 2 lugs per long (left/right) wall; tuned to clear the right-wall DC/leads/fuse
+lug_ys      = [ext_h * 0.25, ext_h * 0.75];   // 2 lugs per long (left/right) wall; tuned to clear the right-wall DC/leads/fuse
 lug_reach   = wall + lip_clear + 0.2 - 2;          // protrude to just past the outer wall face
 lug_hole_clr = 0.6;
 
@@ -67,7 +67,7 @@ dc_y        = ext_h - wall - 24;
 lead_d      = 5;                 // each DC-out lead = 18AWG 2-core + sheath (~5 mm); 6 of them
 lead_n      = 5;
 lead_pitch  = 10;                // lead-hole centre-to-centre
-lead_dc_gap = 17.5;                // from the DC socket down to the first (topmost) lead
+lead_dc_gap = 20;                // from the DC socket down to the first (topmost) lead
 lead_y0     = dc_y - lead_dc_gap;// topmost lead; the rest step DOWN by lead_pitch
 led_d      = 16;                // 3 panel LEDs through the TOP wall (big bezels)
 led_n      = 2;
@@ -92,7 +92,7 @@ fuse_slot_z    = 10;    // ... and height up the wall (Z); centred on the fuse b
 // === Back-plate wall screws (one per corner) ===
 screw_d     = 4.5;
 screw_inset = 7.5;
-screw_shift = 15;   // move the 4 wall-screws this far toward centre IN X (clears the pack brackets,
+screw_shift = 25;   // move the 4 wall-screws this far toward centre IN X (clears the pack brackets,
                     //   keeps them near the top/bottom edges and clear of the BMS/board)
 
 // === Interior: 4s5p 18650 pack (LEFT), gripped at its corners ===
