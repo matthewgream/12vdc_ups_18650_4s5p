@@ -352,4 +352,5 @@ SoC figures are approximate for LG MJ1. They depend on chemistry, temperature an
 
 ## Licence
 
-_TBD — add a `LICENSE` file (e.g. CERN-OHL-P / CC-BY-SA for hardware, MIT for code)._
+CC BY-NC-SA 4.0
+
