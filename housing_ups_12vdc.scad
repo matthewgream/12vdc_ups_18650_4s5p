@@ -26,8 +26,9 @@
 //    Bump ext_w / ext_h / ext_d (≈135 x 235 x 48) and the furniture re-places itself.
 
 // === FLAGS ===
-part = "all";   // "base" | "cover" | "all" (apart) | "assembly" (cover on base)
+part = "assembly";   // "base" | "cover" | "all" (apart) | "assembly" (cover on base)
 mirror_lr = true;   // mirror the whole part left<->right: pack on the RIGHT, BMS/board/cables/DC/fuse on the LEFT
+show_components = true;   // in "assembly": draw colour block stand-ins for the fitted parts (illustration only, NOT printed)
 
 $fn = $preview ? 48 : 128;
 
@@ -129,6 +130,15 @@ pb_post_d   = 7;    // post OD
 pb_post_h   = 5;    // standoff height (airflow under the board)
 pb_pilot    = 3.3;  // pilot for an M4 self-tapping screw
 pb_gap_bms  = 10;   // clear gap above the BMS
+
+// === Mock components (assembly illustration only — NOT printed) ===
+// Schematic blocks sized to each part, seated at the height its furniture holds it.
+pack_body_h  = pack_depth;   // 18650 pack block height (Z), sits on the pads
+bms_body_h   = 12;           // BMS board + components thickness (Z)
+pb_body_h    = 15;           // power board + components thickness (Z)
+fuse_body_d  = 22;           // fuse carrier depth proud of the wall (X, into the box)
+dc_body_len  = 16;           // DC socket barrel length into the box (X)
+led_body_len = 10;           // LED body length into the box (Y)
 
 // === Placement outlines (raised border on the back wall marking where each board sits) ===
 outline_on = true;
@@ -293,6 +303,36 @@ module base_logo() {   // on the LEFT wall outer face, upper (solid) half
         rotate([90, 0, -90]) linear_extrude(logo_sink + logo_raise) logo2d();
 }
 
+// --- mock component blocks (illustration only) ------------------------------
+// Each block is placed in the model frame exactly where its furniture seats it, so wrapping
+// components() in the same mir() as the base keeps every part aligned after the L<->R flip.
+module comp_block(x, y, z, sx, sy, sz, col)   // axis-aligned block by min-corner + size
+    color(col) translate([x, y, z]) cube([sx, sy, sz]);
+
+module components() {
+    // 18650 pack — rests on the corner + mid-span floor pads
+    comp_block(pack_x0, pack_y0, back_t + pad_h,
+               pack_w, pack_y1 - pack_y0, pack_body_h, [0.26, 0.34, 0.46]);
+    // BMS — on its standoff pads, lifted off the floor for wire clearance
+    comp_block(rcol_cx - bms_w/2, wall + bms_lift, back_t + bms_standoff,
+               bms_w, bms_h, bms_body_h, [0.15, 0.35, 0.78]);
+    // power board — on its 4 posts, above the BMS
+    comp_block(rcol_cx - pb_w/2, wall + bms_lift + bms_h + pb_gap_bms, back_t + pb_post_h,
+               pb_w, pb_h, pb_body_h, [0.16, 0.52, 0.27]);
+    // fuse carrier — mounts on the OUTSIDE of the solid RIGHT wall; its 2 bolts + the lead slot
+    // pass through the wall. Block sits proud of the exterior face, aligned to the wall outline.
+    if (fuse_on)
+        comp_block(ext_w, fuse_block_y - fuse_block_len/2, back_t + 1,
+                   fuse_body_d, fuse_block_len, fuse_block_w, [0.88, 0.47, 0.11]);
+    // DC socket — barrel poking in through the RIGHT wall
+    color([0.12, 0.12, 0.12]) translate([ext_w - wall - dc_body_len, dc_y, (back_t + base_wall_h)/2])
+        rotate([0, 90, 0]) cylinder(h = dc_body_len, d = dc_d + 3);
+    // LEDs — bodies poking in through the TOP wall
+    for (i = [0 : led_n - 1])
+        color([0.90, 0.22, 0.20]) translate([ext_w - led_offset - i*led_pitch, ext_h - wall - led_body_len, (back_t + base_wall_h)/2])
+            rotate([-90, 0, 0]) cylinder(h = led_body_len, d = led_d);
+}
+
 module base() {
     difference() {
         union() {
@@ -372,6 +412,7 @@ if (part == "base") mir() base();
 else if (part == "cover") mir() cover();
 else if (part == "assembly") {
     color("Gainsboro") mir() base();
+    if (show_components) mir() components();   // block stand-ins, seated in place, flipped with the base
     // flip the (panel-down) cover onto the base front
     color("LightSteelBlue", 0.6) translate([0, ext_h, base_wall_h + cover_t]) rotate([180, 0, 0]) mir() cover();
 }
