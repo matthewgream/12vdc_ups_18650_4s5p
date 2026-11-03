@@ -4,13 +4,13 @@ A compact DC uninterruptible power supply that delivers a regulated **12 V** to 
 
 It's built around an off-the-shelf DC UPS module that does the charging, power-path switching, buck-boost regulation and battery undervoltage cutoff. Around it sit a balancing BMS, per-output fusing, and a 3D-printed PETG housing and cell harness (OpenSCAD sources included).
 
+> ⚠️ **Lithium-ion packs store a lot of energy (~250 Wh here) and can cause fires if built or used incorrectly.** This is a record of one build, not a certified product. Build at your own risk, and only if you are comfortable with spot-welding cells, pack wiring and DC fusing.
+
 | Assembly | Plan |
 |---|---|
 | ![Assembly view](housing_ups_12vdc_assembly.png) | ![Plan view](housing_ups_12vdc_plan.png) |
 
 _Renders of the housing design. See [Build photos](#build-photos) for the real thing._
-
-> ⚠️ **Lithium-ion packs store a lot of energy (~250 Wh here) and can cause fires if built or used incorrectly.** This is a record of one build, not a certified product. Build at your own risk, and only if you are comfortable with spot-welding cells, pack wiring and DC fusing.
 
 ---
 
@@ -146,7 +146,7 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 
 | Qty | Item | Price (ea.) | Notes | Link |
 |---|---|---|---|---|
-| 1 | DC power supply 24 V 5 A, 5.5/2.x barrel | £10.99 | Mains input. Must be ≥ 1 V above the charge voltage (≥ 17.8 V covers every ceiling up to 16.8 V). 5 A (120 W) covers ~75 W of load while charging. | [AliExpress](https://www.aliexpress.com/item/1005007332397741.html) |
+| 1 | DC power supply 24 V 5 A, 5.5/2.x barrel | £13.94 | Mains input. Must be ≥ 1 V above the charge voltage (≥ 17.8 V covers every ceiling up to 16.8 V). 5 A (120 W) covers ~75 W of load while charging. | [AliExpress](https://www.aliexpress.com/item/1005007332397741.html) |
 | 1 | DC UPS power module, 12 V out, 15 A max input | £36.79 | Main board: charger, power path, buck-boost regulator, UVP, LEDs | [AliExpress](https://www.aliexpress.com/item/1005001636977344.html) |
 | 1 | Daly 4S 15 A BMS, 3.7 V Li-ion, common port, with balancing | £7.15 | Per-cell protection and passive balancing | [AliExpress](https://www.aliexpress.com/item/1005005995685641.html) |
 | 1 | Inline blade fuse holder, 16 AWG, 10 A (2-pack) | — | Used for F0 (pack, 10 A fuse) and one output. With the 5-pack below this gives 7 holders: 6 × 16 AWG (F0, F2–F6) and 1 × 12 AWG (F1). | [Amazon](https://www.amazon.co.uk/dp/B0HG927H6S) |
@@ -170,7 +170,7 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 | 1 | 3D-printed housing (base + cover), PETG | — | See below | — |
 | 1 + 2 | 3D-printed cell harness: 1 footer + 2 spacers, PETG | — | See below | — |
 
-**Approximate total:** ~£142 plus fuse holders (parts listed with prices, excluding printing, tools and consumables).
+**Approximate total:** ~£150 plus fuse holders (parts listed with prices, excluding printing, tools and consumables).
 
 ---
 
