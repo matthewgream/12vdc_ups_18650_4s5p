@@ -142,7 +142,7 @@ Real-world draw of network gear is usually well below adapter ratings. Measure y
 
 ## Bill of materials
 
-Prices are as purchased (GBP, late 2026) and are indicative only. Choose 5.5/2.1mm or 5.5/2.5mm barrel fittings as appropriate. I purchased and equal set of both, and the 24 V power supply turned out to have 2.1mm male, so the 2.1mm variant of the panel connector was installed. One option is to dual 5.5/2.1+2.5 on each output, or to select 2.1 or 2.5 but arm with 2.1->2.5 or 2.5->2.1 adapters.
+Prices are as purchased (GBP, late 2026) and are indicative only. Choose 5.5/2.1mm or 5.5/2.5mm barrel fittings as appropriate. I purchased an equal set of both, and the 24 V power supply turned out to have 2.1mm male, so the 2.1mm variant of the panel connector was installed. Other options are to dual 5.5/2.1+2.5 on each output, or to select 2.1 or 2.5 but arm with 2.1->2.5 or 2.5->2.1 adapters.
 
 | Qty | Item | Price (ea.) | Notes | Link |
 |---|---|---|---|---|
