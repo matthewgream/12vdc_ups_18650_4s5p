@@ -46,7 +46,7 @@
 // ==========================================================================
 
 // --- What to build ---
-part = "assembly";        // "base" | "cover" | "all" (apart) | "assembly" (cover on base)
+part = "all";        // "base" | "cover" | "all" (apart) | "assembly" (cover on base)
 mirror_lr = true;         // mirror the whole part left<->right: pack RIGHT, BMS/board/DC/fuse LEFT
 show_components = true;    // "assembly": colour block stand-ins for the fitted parts (illustration, NOT printed)
 $fn = $preview ? 48 : 128;
@@ -100,8 +100,8 @@ fuse_slot_z    = 10;    // ... and height up the wall (Z); centred on the fuse b
 
 // --- Back-plate wall screws (one per corner) ---
 screw_d     = 4.5;
-screw_inset = 7.5;
-screw_shift = 25;    // move the 4 wall-screws this far toward centre in X (clears the pack brackets)
+screw_inset = 5.5;
+screw_shift = 30;    // move the 4 wall-screws this far toward centre in X (clears the pack brackets)
 
 // --- Interior: 4s5p 18650 pack, gripped at its corners ---
 // pack_w / pack_h are the ACTUAL pack footprint (cells + weld strips + insulation) = the clear slot
