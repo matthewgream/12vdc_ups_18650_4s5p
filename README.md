@@ -184,11 +184,11 @@ Prices are as purchased (GBP, late 2026) and are indicative only. Choose 5.5/2.1
 | `housing_ups_12vdc_cover.stl` | (Generated) Enclosure cover |
 | `housing_ups_12vdc_assembly.png` | (Generated) Assembly render |
 | `housing_ups_12vdc_plan.png` | (Generated) Top-down plan render |
-| `images/` | Build photos |
+| `harness_cell_pack_18650.scad` | (Source) Parametric OpenSCAD source for the harness |
+| `harness_cell_pack_18650_footer.stl` | (Generated) Cell footer: welding jig |
+| `harness_cell_pack_18650_spacer.stl` | (Generated) Cell spacer: structural |
 | `Makefile` | Build targets for the generated files |
-| `18650-cell-pack-harness.scad` | (Source) Parametric OpenSCAD source for the harness |
-| `18650-cell-pack-harness_footer.stl` | (Generated) Cell footer: welding jig |
-| `18650-cell-pack-harness_spacer.stl` | (Generated) Cell spacer: structural |
+| `images/` | Build photos |
 
 **Cell harness.** The honeycomb cells don't butt against each other, so the welded nickel shouldn't be the only thing holding the pack in shape.
 - **Footer:** the cells stand in it during welding, which holds them square and level so the strips sit flat across all ends.
