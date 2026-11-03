@@ -37,7 +37,7 @@ _Renders of the housing design. See [Build photos](#build-photos) for the real t
 | | |
 |---|---|
 | Output | 12.0 V DC regulated, 5 individually fused outputs (2 A, 2 A, 3 A, 3 A, 5 A; 5.5 mm barrel) |
-| Input | 24 V DC, 4 A (96 W) external adapter |
+| Input | 24 V DC, 5 A (120 W) external adapter |
 | Battery | 20 × 18650 Li-ion, 4S5P, ~14.5 V nominal, ~17.5 Ah, ~254 Wh |
 | Switchover | Zero-time; output stays regulated across mains loss and return |
 | Protection | Board UVP + output OCP/short protection, Daly 4S BMS (per-cell OV/UV/OC/short + balancing), fused battery, input and outputs |
@@ -73,8 +73,8 @@ These come from the weakest component in each path, not from the module alone.
 | Parameter | Limit | Set by |
 |---|---|---|
 | Output, on battery | **≤ 100 W continuous** (8.3 A) | UPS module |
-| Output, on mains, while charging | **≤ ~55 W continuous** | 24 V 4 A adapter (96 W) minus ~34 W charging |
-| Output, on mains, battery full | ≤ ~90 W | 24 V 4 A adapter |
+| Output, on mains, while charging | **≤ ~75 W continuous** | 24 V 5 A adapter (120 W) minus ~34 W charging |
+| Output, on mains, battery full | **≤ 100 W** | UPS module (the 120 W adapter is no longer the limit) |
 | Per-output current | Fuse rating: 2 / 2 / 3 / 3 / 5 A | Output fuses (F2–F6) |
 | **Total output, all outputs combined** | **≤ 8.3 A continuous (100 W), 10 A peak** | UPS module. The output fuses add up to 15 A, so they are deliberately over-provisioned. Each fuse protects only its own branch, and the combined load must stay within the module rating (and within the adapter budget on mains). |
 | Battery discharge current | ~8.5 A at 100 W out and 12.4 V cutoff (~1.7 A/cell) | Load; pack fuse 10 A, BMS 15 A, cells 10 A each |
@@ -86,7 +86,7 @@ These come from the weakest component in each path, not from the module alone.
 | Cell discharge temperature | −20 to +60 °C | Li-ion chemistry |
 | Enclosure ambient | Indoor, dry, ideally 10–30 °C | Housing material and cell life |
 
-> **Note on the adapter:** the module doesn't appear to throttle charge current to protect the adapter. If your loads exceed ~55 W, use a **24 V 5 A (120 W)** or larger adapter, or reduce the charge current.
+> **Note on the adapter:** the module doesn't appear to throttle charge current to protect the adapter. The **24 V 5 A (120 W)** adapter supports ~75 W of output while charging; for heavier loads, reduce the charge current or fit a larger adapter.
 
 > **Note on "10 A":** the module's continuous rating is **8.3 A at 12 V**, with 10 A as a peak. Size loads accordingly.
 
@@ -112,7 +112,7 @@ Real-world draw of network gear is usually well below adapter ratings. Measure y
 ## Architecture
 
 ```
- 230 VAC ──► 24 V 4 A PSU ──► panel jack ──► [F1 5 A, inline] ──► UPS VIN+ / GND
+ 230 VAC ──► 24 V 5 A PSU ──► panel jack ──► [F1 7.5 A, inline] ──► UPS VIN+ / GND
                                                          │
                                                   ┌──────┴───────┐
                                                   │  UPS module  │  charge (CC/CV, buck)
@@ -146,12 +146,12 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 
 | Qty | Item | Price (ea.) | Notes | Link |
 |---|---|---|---|---|
-| 1 | DC power supply 24 V 4 A / 5 A, 5.5/2.x barrel | £10.99 | Mains input. Must be ≥ 1 V above the charge voltage (≥ 17.8 V covers every ceiling up to 16.8 V). 4 A (96 W) covers ~55 W load while charging; use 5 A for heavier loads. | [AliExpress](https://www.aliexpress.com/item/1005007332397741.html) |
+| 1 | DC power supply 24 V 5 A, 5.5/2.x barrel | £10.99 | Mains input. Must be ≥ 1 V above the charge voltage (≥ 17.8 V covers every ceiling up to 16.8 V). 5 A (120 W) covers ~75 W of load while charging. | [AliExpress](https://www.aliexpress.com/item/1005007332397741.html) |
 | 1 | DC UPS power module, 12 V out, 15 A max input | £36.79 | Main board: charger, power path, buck-boost regulator, UVP, LEDs | [AliExpress](https://www.aliexpress.com/item/1005001636977344.html) |
 | 1 | Daly 4S 15 A BMS, 3.7 V Li-ion, common port, with balancing | £7.15 | Per-cell protection and passive balancing | [AliExpress](https://www.aliexpress.com/item/1005005995685641.html) |
 | 2 | Inline blade fuse holder, 16 AWG, 10 A (2-pack) | — | Used for F0 (pack, 10 A fuse) and one output | [Amazon](https://www.amazon.co.uk/dp/B0HG927H6S) |
-| 1 | Inline blade fuse holder set (5 pcs): 1 × 12 AWG 15–30 A, 4 × 16 AWG 10 A | — | 12 AWG holder for F1 (24 V input, 5 A fuse). 4 × 16 AWG holders for outputs. | [Amazon](https://www.amazon.co.uk/dp/B0DBPQBGBQ) |
-| n | DC blade fuses 2/3/5/10 A | £0.93 | F0 10 A, F1 5 A, F2–F6 2/2/3/3/5 A. Name-brand with 1000 A DC interrupt rating recommended for F0. | [AliExpress](https://www.aliexpress.com/item/4000832079230.html) |
+| 1 | Inline blade fuse holder set (5 pcs): 1 × 12 AWG 15–30 A, 4 × 16 AWG 10 A | — | 12 AWG holder for F1 (24 V input, 7.5 A fuse). 4 × 16 AWG holders for outputs. | [Amazon](https://www.amazon.co.uk/dp/B0DBPQBGBQ) |
+| n | DC blade fuses 2/3/5/7.5/10 A | £0.93 | F0 10 A, F1 7.5 A, F2–F6 2/2/3/3/5 A. Name-brand with 1000 A DC interrupt rating recommended for F0. | [AliExpress](https://www.aliexpress.com/item/4000832079230.html) |
 | 1 | DC 5.5/2.x barrel panel connector, 10 A, 15 cm | £1.37 | Mains adapter input jack | [AliExpress](https://www.aliexpress.com/item/1005007189485497.html) |
 | 5 | DC 5.5/2.x power leads, 18 AWG, 1.5 m | £3.26 | One per output. Match inner diameter (2.1 or 2.5 mm) to each device. 18 AWG is good to ~7 A. | [AliExpress](https://www.aliexpress.com/item/1005012145395888.html) |
 | 1 | DC voltage level display (panel meter) | £4.69 | Front-panel battery/voltage readout; fits the 60 × 30 mm window in the cover. | [AliExpress](https://www.aliexpress.com/item/1005006408211879.html) |
@@ -229,14 +229,14 @@ All fuses are inline blade holders inside the housing.
 | Fuse | Circuit | Fuse rating | Holder |
 |---|---|---|---|
 | F0 | Pack positive → Anderson | 10 A | 16 AWG, 10 A |
-| F1 | 24 V input: panel jack → UPS Vin+ | 5 A (suits the 4 A adapter) | 12 AWG, 15–30 A |
+| F1 | 24 V input: panel jack → UPS Vin+ | 7.5 A (suits the 5 A adapter) | 12 AWG, 15–30 A |
 | F2 | OUT1 | 2 A | 16 AWG, 10 A |
 | F3 | OUT2 | 2 A | 16 AWG, 10 A |
 | F4 | OUT3 | 3 A | 16 AWG, 10 A |
 | F5 | OUT4 | 3 A | 16 AWG, 10 A |
 | F6 | OUT5 | 5 A | 16 AWG, 10 A |
 
-The outputs are a choice of ratings: plug each device into an output whose fuse is roughly 1.5–2× its normal draw and no more than its original adapter rating. The output fuses total 15 A, but **the combined load must stay within 8.3 A continuous** (the module limit), and within ~55 W on mains while charging (the adapter limit). Keep peak loads in mind when adding devices.
+The outputs are a choice of ratings: plug each device into an output whose fuse is roughly 1.5–2× its normal draw and no more than its original adapter rating. The output fuses total 15 A, but **the combined load must stay within 8.3 A continuous** (the module limit), and within ~75 W on mains while charging (the adapter limit). Keep peak loads in mind when adding devices.
 
 Example allocation (this installation):
 
@@ -296,7 +296,7 @@ SoC figures are approximate for LG MJ1. They depend on chemistry, temperature an
 
 ### Why these values
 - **Charge ceiling 16.2 V (85%):** see above. Longevity is the priority for an always-on UPS.
-- **2.0 A:** gentle (0.4 A per cell, ~0.11C). Recharge time isn't critical. A full recharge from cutoff takes ~8–9 h, and total adapter load stays well within 96 W.
+- **2.0 A:** gentle (0.4 A per cell, ~0.11C). Recharge time isn't critical. A full recharge from cutoff takes ~8–9 h, and total adapter load stays well within 120 W.
 - **12.4 V cutoff:** well above the BMS's own over-discharge trip, so the BMS is a backstop rather than the normal cutoff. Also little capacity is left below ~3.1 V/cell under load.
 - **13.6 V restart:** enough hysteresis that a rested pack recovering after cutoff doesn't make the output cycle on and off.
 
@@ -334,7 +334,7 @@ SoC figures are approximate for LG MJ1. They depend on chemistry, temperature an
 
 ## Safety notes
 
-- **Fusing:** every source is fused: pack (F0, 10 A, inline), adapter input (F1, 5 A, inline), each output (F2–F6, 2/2/3/3/5 A), all inline inside the housing. The pack fuse is the critical one. A 254 Wh pack can source hundreds of amps into a short.
+- **Fusing:** every source is fused: pack (F0, 10 A, inline), adapter input (F1, 7.5 A, inline), each output (F2–F6, 2/2/3/3/5 A), all inline inside the housing. The pack fuse is the critical one. A 254 Wh pack can source hundreds of amps into a short.
 - **Disconnect** the battery (Anderson) before any work on the board, wiring or settings.
 - **Never charge below 0 °C.** Lithium plating causes permanent damage and internal shorts. Don't install in unheated outbuildings or lofts without accounting for this.
 - **Location:** mount on a non-combustible surface, away from soft furnishings, with airflow around the enclosure. A printed enclosure provides no fire containment.
