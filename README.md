@@ -149,12 +149,12 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 | 1 | DC power supply 24 V 5 A, 5.5/2.x barrel | £10.99 | Mains input. Must be ≥ 1 V above the charge voltage (≥ 17.8 V covers every ceiling up to 16.8 V). 5 A (120 W) covers ~75 W of load while charging. | [AliExpress](https://www.aliexpress.com/item/1005007332397741.html) |
 | 1 | DC UPS power module, 12 V out, 15 A max input | £36.79 | Main board: charger, power path, buck-boost regulator, UVP, LEDs | [AliExpress](https://www.aliexpress.com/item/1005001636977344.html) |
 | 1 | Daly 4S 15 A BMS, 3.7 V Li-ion, common port, with balancing | £7.15 | Per-cell protection and passive balancing | [AliExpress](https://www.aliexpress.com/item/1005005995685641.html) |
-| 2 | Inline blade fuse holder, 16 AWG, 10 A (2-pack) | — | Used for F0 (pack, 10 A fuse) and one output | [Amazon](https://www.amazon.co.uk/dp/B0HG927H6S) |
+| 1 | Inline blade fuse holder, 16 AWG, 10 A (2-pack) | — | Used for F0 (pack, 10 A fuse) and one output. With the 5-pack below this gives 7 holders: 6 × 16 AWG (F0, F2–F6) and 1 × 12 AWG (F1). | [Amazon](https://www.amazon.co.uk/dp/B0HG927H6S) |
 | 1 | Inline blade fuse holder set (5 pcs): 1 × 12 AWG 15–30 A, 4 × 16 AWG 10 A | — | 12 AWG holder for F1 (24 V input, 7.5 A fuse). 4 × 16 AWG holders for outputs. | [Amazon](https://www.amazon.co.uk/dp/B0DBPQBGBQ) |
 | n | DC blade fuses 2/3/5/7.5/10 A | £0.93 | F0 10 A, F1 7.5 A, F2–F6 2/2/3/3/5 A. Name-brand with 1000 A DC interrupt rating recommended for F0. | [AliExpress](https://www.aliexpress.com/item/4000832079230.html) |
 | 1 | DC 5.5/2.x barrel panel connector, 10 A, 15 cm | £1.37 | Mains adapter input jack | [AliExpress](https://www.aliexpress.com/item/1005007189485497.html) |
 | 5 | DC 5.5/2.x power leads, 18 AWG, 1.5 m | £3.26 | One per output. Match inner diameter (2.1 or 2.5 mm) to each device. 18 AWG is good to ~7 A. | [AliExpress](https://www.aliexpress.com/item/1005012145395888.html) |
-| 1 | DC voltage level display (panel meter) | £4.69 | Front-panel battery/voltage readout; fits the 60 × 30 mm window in the cover. | [AliExpress](https://www.aliexpress.com/item/1005006408211879.html) |
+| 1 | DC voltage level display (panel meter) | £4.69 | Front-panel battery voltage readout; fits the 60 × 30 mm window in the cover. Its measuring and supply range must cover the pack (12–16.8 V). See [Wiring](#6-wiring) for where to connect it. | [AliExpress](https://www.aliexpress.com/item/1005006408211879.html) |
 | 2 | 6 mm LED indicator, panel mount, 3–6 V | £0.78 | Front-panel status LEDs via J8 (e.g. input power, charging/fault), mounted in the cover beside the meter. 5-pack (£3.89). | [AliExpress](https://www.aliexpress.com/item/1005005391948256.html) |
 | 20 | LG MJ1 18650, 3500 mAh, 10 A | £2.81 | 4S5P, welded in a 10 × 2 honeycomb array | [Cell Supply](https://www.cellsupply.co.uk/lg-mj1-18650-battery) |
 | 1 | 2-core 18 AWG silicone tinned copper wire | £1.60 | Internal hookup | [AliExpress](https://www.aliexpress.com/item/1005012526819544.html) |
@@ -170,7 +170,7 @@ Prices are as purchased (GBP, late 2026) and are indicative only.
 | 1 | 3D-printed housing (base + cover), PETG | — | See below | — |
 | 1 + 2 | 3D-printed cell harness: 1 footer + 2 spacers, PETG | — | See below | — |
 
-**Approximate total:** ~£140 plus fuse holders (parts listed with prices, excluding printing, tools and consumables).
+**Approximate total:** ~£142 plus fuse holders (parts listed with prices, excluding printing, tools and consumables).
 
 ---
 
@@ -257,6 +257,8 @@ Example allocation (this installation):
 - UPS output **GND** → negative edge connector (fan-out) → barrel sleeves.
 - Pack (via F0 and Anderson) → UPS **BAT** terminals (J1).
 - LEDs → J8 via the 3-pin JST lead (J8 carries LED1–LED3).
+- Panel meter → UPS **BAT** terminals (J1), i.e. downstream of F0 and the Anderson, so its leads are fused and opening the Anderson disconnects it. Use a 2-wire meter there, or for a 3-wire meter take both its supply and its sense lead from BAT.
+- **The meter is a permanent load on the pack** (typically 5–20 mA), including after the module's undervoltage cutoff has turned the output off. On a very long outage it keeps discharging the pack below 12.4 V until the BMS's own undervoltage trip disconnects it. That's safe, because the BMS is the backstop, but the pack then needs mains back to wake the BMS. If you'd rather avoid this, take the meter's supply from the 12 V output instead, so it switches off with the UVP, and keep only its sense lead on BAT (3-wire meters only).
 
 ### 7. Jumpers
 - **J5 closed** (start switch) and **J7 shorted** (auto-start). Together these make the module start automatically whenever input power returns or the battery recovers above VSTART. Unattended operation needs this.
@@ -321,6 +323,7 @@ SoC figures are approximate for LG MJ1. They depend on chemistry, temperature an
 
 ## Operation and maintenance
 
+- **Panel meter:** shows pack voltage. Use the [charge ceiling table](#charge-ceiling-state-of-charge) for full (16.0–16.8 V depending on setting) and 12.4 V for empty (UVP cutoff). Readings while charging or under load are a few tenths of a volt off the resting value.
 - **Indicators:** LED1 blue = input present. LED3 green = charging; flashes when the battery is below VSTART, or flashes twice when it's below VUVP at start-up. LED2 red = charge complete. LED4 red = output on.
 - **After an outage,** the module recharges automatically. A full recharge from cutoff takes ~8–9 h at 2.0 A.
 - **Every 6–12 months:**
@@ -349,7 +352,10 @@ SoC figures are approximate for LG MJ1. They depend on chemistry, temperature an
 
 <a href="images/housing_ups_12vdc_bench_test.jpg"><img src="images/housing_ups_12vdc_bench_test.jpg" alt="Bench test of the UPS module, pack and wiring before final assembly" width="800"></a>
 
-_Bench test before final assembly._ Confirm power is supplied while plugged (mains vs. transformer) and unplugged (battery). Allow battery to supply and drain down sufficiently below threshold, then re-establish power to charge and monitor charging and completion. Measure charged voltage. Repeat with drain down to critical limits.
+_Bench test before final assembly._ Tests run:
+- Output stays up on the 24 V adapter and when the adapter is unplugged (battery).
+- Discharge on battery past the restart threshold, then restore the adapter and monitor charging through to termination. Measure the charged pack voltage.
+- Repeat with the pack drained down to the undervoltage cutoff.
 
 ---
 
@@ -360,7 +366,7 @@ _Bench test before final assembly._ Confirm power is supplied while plugged (mai
 - **5P:** ~8 h runtime for ~25 W of network equipment, with each cell working at < 0.5 A typical.
 - **Separate BMS:** the module only monitors total pack voltage. The Daly BMS adds per-cell over- and undervoltage protection, short-circuit protection and balancing.
 - **Reduced charge ceiling and current:** an always-on UPS is limited by calendar ageing at high state of charge, and recharge time is rarely critical. So both are set for longevity rather than maximum runtime or fast recharge.
-- **24 V adapter:** gives the 1 V headroom the step-down charger needs above any charge ceiling up to 16.8 V. Lower-voltage adapters (19 V) would also work and reduce conversion spread slightly.
+- **24 V adapter:** gives the 1 V headroom the step-down charger needs above any charge ceiling up to 16.8 V. A 19 V adapter would also work and slightly reduce charger conversion loss, but 24 V 5 A units are more common.
 
 ---
 
