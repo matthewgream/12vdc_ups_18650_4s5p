@@ -45,13 +45,11 @@
 //  PARAMETERS
 // ==========================================================================
 
-// --- What to build ---
 part = "all";           // "base" | "cover" | "all" (apart) | "assembly" (cover on base)
 mirror_lr = true;       // mirror the whole part left<->right: pack RIGHT, BMS/board/DC/fuse LEFT
 show_components = true; // "assembly": colour block stand-ins for the fitted parts (illustration, NOT printed)
 $fn = $preview ? 48 : 128;
 
-// --- Enclosure shell ---
 ext_w = 135;                   // X width  (bumped from 125 so the board posts clear the right side)
 ext_h = 220;                   // Y height (bumped from 210 for the pack + the lifted BMS/board stack)
 ext_d = 55;                    // Z depth
@@ -61,12 +59,15 @@ cover_t = 2.5;                 // cover front-panel thickness
 corner_r = 4;                  // rounded external vertical corners
 base_wall_h = ext_d - cover_t; // base sides rise this far; cover panel completes ext_d
 
-// --- Grills (parallel stadium slots; shared by base walls + cover panel) ---
 grill_slot = 2.5; // slot width
 grill_pitch = 6;  // slot pitch
 grill_marg = 9;   // solid margin kept at wall ends / rims
 
 // -------------------------------- BASE ------------------------------------
+
+screw_d = 4.5;
+screw_inset = 5.5;
+screw_shift = 30; // move the 4 wall-screws this far toward centre in X (clears the pack brackets)
 
 dc_z_frac = 0.60; // Z centre of the side-wall holes as a fraction of the wall depth (back_t..base_wall_h); 0.5 = mid
 
@@ -83,21 +84,17 @@ led_side = false; // LEDs in the TOP wall? false -> no LED holes (led_* ignored)
 led_side_d = 16;  // panel LEDs through the TOP wall (big bezels) -- only when led_side
 led_side_n = 2;
 led_side_offset = 24; // first (rightmost) LED centre, measured in from the right (ext_w) edge
-led_pitch = 24;       // LED centre-to-centre; the rest step left from the first
+led_side_pitch = 24;  // LED centre-to-centre; the rest step left from the first
 
 fuse_holder_external = false;
-fuse_block_len = 94;                          // along the wall (Y)
-fuse_block_w = 40;                            // up the wall (Z)
-fuse_block_y = 80;                            // centre Y on the wall (below the lead holes)
-fuse_block_z = back_t + fuse_block_w / 2 + 1; // centre Z (block rests on the back plate)
-fuse_screw_d = 4.25;                          // wall through-holes for the carrier's 2 mounting bolts (carrier holes are Ø6)
-fuse_screw_cc = 76.5;                         // bolt centre-to-centre, along the block's long (Y) axis
-fuse_slot_y = 15;                             // fuse-lead feed-through slot: length along the long (Y) axis
-fuse_slot_z = 10;                             // ... and height up the wall (Z); centred on the fuse block
-
-screw_d = 4.5;
-screw_inset = 5.5;
-screw_shift = 30; // move the 4 wall-screws this far toward centre in X (clears the pack brackets)
+fuse_holder_len = 94;                           // along the wall (Y)
+fuse_holder_w = 40;                             // up the wall (Z)
+fuse_holder_y = 80;                             // centre Y on the wall (below the lead holes)
+fuse_holder_z = back_t + fuse_holder_w / 2 + 1; // centre Z (block rests on the back plate)
+fuse_holder_screw_d = 4.25;                     // wall through-holes for the carrier's 2 mounting bolts (carrier holes are Ø6)
+fuse_holder_screw_cc = 76.5;                    // bolt centre-to-centre, along the block's long (Y) axis
+fuse_holder_slot_y = 15;                        // fuse-lead feed-through slot: length along the long (Y) axis
+fuse_holder_slot_z = 10;                        // ... and height up the wall (Z); centred on the fuse block
 
 pack_w = 68;                                               // X  (measured pack width; add clearance here for a looser slot)
 pack_h = 202.5;                                            // Y  (measured pack length)
@@ -131,15 +128,15 @@ bms_grip_len = 50;                     // grip-wall length (Y); centred on the B
 bms_grip_t = 2.5;                      // grip-wall thickness (X)
 bms_grip_z = back_t + bms_lift_z + 12; // grip-wall height (Z)
 
-bms_pb_gap = 15; // clear gap above the BMS
+bms_power_gap = 15; // clear gap above the BMS
 
-pb_w = 50;        // X
-pb_h = 110;       // Y
-pb_hole_dx = 43;  // mounting-hole spacing, X
-pb_hole_dy = 103; // mounting-hole spacing, Y
-pb_post_d = 7;    // post OD
-pb_post_h = 5;    // standoff height (airflow under the board)
-pb_pilot = 3.3;   // pilot for an M4 self-tapping screw
+power_w = 50;        // X
+power_h = 110;       // Y
+power_hole_dx = 43;  // mounting-hole spacing, X
+power_hole_dy = 103; // mounting-hole spacing, Y
+power_post_d = 7;    // post OD
+power_post_h = 5;    // standoff height (airflow under the board)
+power_pilot = 3.3;   // pilot for an M4 self-tapping screw
 
 outline_on = true;
 outline_t = 0.75; // outline line thickness
@@ -185,7 +182,7 @@ mono_rot = -90;  // hat rotation (deg)
 
 pack_body_h = pack_depth; // 18650 pack block height (Z), sits on the pads
 bms_body_h = 12;          // BMS board + components thickness (Z)
-pb_body_h = 15;           // power board + components thickness (Z)
+power_body_h = 15;        // power board + components thickness (Z)
 fuse_body_d = 22;         // fuse carrier depth proud of the wall (X, into the box)
 dc_body_len = 16;         // DC socket barrel length into the box (X)
 led_body_len = 10;        // LED body length into the box (Y)
@@ -193,6 +190,7 @@ led_body_len = 10;        // LED body length into the box (Y)
 // ==========================================================================
 //  HELPERS
 // ==========================================================================
+
 module rrect(w, h, r) offset(r) offset(-r) square([ w, h ], center = true);
 module stadium2d(len, thick) hull() for (s = [ -1, 1 ]) translate([ s * (len / 2 - thick / 2), 0 ]) circle(d = thick);
 
@@ -209,12 +207,12 @@ module monotile2d() resize([ mono_w, 0, 0 ], auto = true) translate([ -27.785, -
 // ==========================================================================
 //  BASE
 // ==========================================================================
+
 module base_shell() difference() {
     linear_extrude(base_wall_h) translate([ ext_w / 2, ext_h / 2 ]) rrect(ext_w, ext_h, corner_r);
     translate([ 0, 0, back_t ]) linear_extrude(base_wall_h + 1) translate([ ext_w / 2, ext_h / 2 ]) rrect(ext_w - 2 * wall, ext_h - 2 * wall, max(0.5, corner_r - wall));
 }
 
-// grills: top & bottom walls full; left wall over its bottom half (right wall solid for the fuse)
 module base_grills() {
     zs = [for (z = [back_t + grill_marg:grill_pitch:base_wall_h - grill_marg]) z];
     // top wall (+Y) -- full width, unless led_side reserves the right half for the panel LEDs
@@ -243,12 +241,12 @@ module base_apertures() {
     // TOP wall: panel LEDs (cylinders along Y), stepping left from the right end -- only when led_side
     if (led_side)
         for (i = [0:led_side_n - 1])
-            translate([ ext_w - led_side_offset - i * led_pitch, ext_h - wall - 1, zc ]) rotate([ -90, 0, 0 ]) cylinder(h = wall + 2, d = led_side_d);
+            translate([ ext_w - led_side_offset - i * led_side_pitch, ext_h - wall - 1, zc ]) rotate([ -90, 0, 0 ]) cylinder(h = wall + 2, d = led_side_d);
     // RIGHT wall: fuse-carrier mounting-bolt holes (2, along Y) + lead feed-through slot, centred on the block
     if (fuse_holder_external) {
         for (s = [ -1, 1 ])
-            translate([ ext_w - wall - 1, fuse_block_y + s * fuse_screw_cc / 2, fuse_block_z ]) rotate([ 0, 90, 0 ]) cylinder(h = wall + 2, d = fuse_screw_d);
-        translate([ ext_w - wall - 1, fuse_block_y, fuse_block_z ]) rotate([ 0, 90, 0 ]) linear_extrude(wall + 2) rrect(fuse_slot_z, fuse_slot_y, 3); // 10(Z) x 15(Y) rounded slot
+            translate([ ext_w - wall - 1, fuse_holder_y + s * fuse_holder_screw_cc / 2, fuse_holder_z ]) rotate([ 0, 90, 0 ]) cylinder(h = wall + 2, d = fuse_holder_screw_d);
+        translate([ ext_w - wall - 1, fuse_holder_y, fuse_holder_z ]) rotate([ 0, 90, 0 ]) linear_extrude(wall + 2) rrect(fuse_holder_slot_z, fuse_holder_slot_y, 3); // 10(Z) x 15(Y) rounded slot
     }
     // BACK plate: 4 wall-screws, shifted toward centre in X to clear the pack brackets
     for (sx = [ screw_inset + screw_shift, ext_w - screw_inset - screw_shift ], sy = [ screw_inset, ext_h - screw_inset ])
@@ -262,6 +260,7 @@ module base_apertures() {
 }
 
 // --- interior furniture ---
+
 module corner_bracket() { // L at origin, legs along +X and +Y, raised floor pad
     linear_extrude(pack_br_h) difference() {
         square([ pack_br_leg, pack_br_leg ]);
@@ -269,18 +268,14 @@ module corner_bracket() { // L at origin, legs along +X and +Y, raised floor pad
     }
     cube([ pack_br_leg, pack_br_leg, pack_pad_h ]); // raised floor so the pack sits proud
 }
-module battery_brackets() translate([ 0, 0, back_t ]) {                                                // each L's inner crook lands exactly on a pack corner -> clear slot = pack_w x pack_h
-    translate([ pack_x0 - pack_br_t, pack_y0 - pack_br_t, 0 ]) corner_bracket();                       // bottom-left
-    translate([ pack_x1 + pack_br_t, pack_y0 - pack_br_t, 0 ]) rotate([ 0, 0, 90 ]) corner_bracket();  // bottom-right
-    translate([ pack_x0 - pack_br_t, pack_y1 + pack_br_t, 0 ]) rotate([ 0, 0, -90 ]) corner_bracket(); // top-left
-    translate([ pack_x1 + pack_br_t, pack_y1 + pack_br_t, 0 ]) rotate([ 0, 0, 180 ]) corner_bracket(); // top-right
-}
 
-// extra floor pads spanning the full pack width, spaced along its length to support the
-// middle (the corner pads alone leave the long pack unsupported mid-span). Same pack_pad_h as the
-// corner pads so the pack sits level on all six points. Each pad carries a zip-tie channel
-// bored right through in X (centred in length; height above floor set by pack_sup_pad_tie_z) to lash the pack down.
-module support_pads() {
+module pack_mount() {
+    translate([ 0, 0, back_t ]) {                                                                          // each L's inner crook lands exactly on a pack corner -> clear slot = pack_w x pack_h
+        translate([ pack_x0 - pack_br_t, pack_y0 - pack_br_t, 0 ]) corner_bracket();                       // bottom-left
+        translate([ pack_x1 + pack_br_t, pack_y0 - pack_br_t, 0 ]) rotate([ 0, 0, 90 ]) corner_bracket();  // bottom-right
+        translate([ pack_x0 - pack_br_t, pack_y1 + pack_br_t, 0 ]) rotate([ 0, 0, -90 ]) corner_bracket(); // top-left
+        translate([ pack_x1 + pack_br_t, pack_y1 + pack_br_t, 0 ]) rotate([ 0, 0, 180 ]) corner_bracket(); // top-right
+    }
     L = pack_y1 - pack_y0;
     translate([ 0, 0, back_t ]) for (i = [1:pack_sup_pad_n]) translate([ pack_x0, pack_y0 + i * L / (pack_sup_pad_n + 1) - pack_sup_pad_len / 2, 0 ]) difference() {
         cube([ pack_w, pack_sup_pad_len, pack_pad_h ]);
@@ -307,21 +302,23 @@ module bms_mount() {
     }
 }
 
-module power_posts() {
-    by0 = wall + bms_lift_y + bms_h + bms_pb_gap; // board bottom (above the lifted BMS)
-    cy = by0 + pb_h / 2;                          // board centre Y
-    translate([ 0, 0, back_t ]) for (hx = [ rcol_cx - pb_hole_dx / 2, rcol_cx + pb_hole_dx / 2 ], hy = [ cy - pb_hole_dy / 2, cy + pb_hole_dy / 2 ]) translate([ hx, hy, 0 ]) difference() {
-        cylinder(h = pb_post_h, d = pb_post_d);
-        translate([ 0, 0, 1 ]) cylinder(h = pb_post_h, d = pb_pilot);
+module power_mount() {
+    by0 = wall + bms_lift_y + bms_h + bms_power_gap; // board bottom (above the lifted BMS)
+    cy = by0 + power_h / 2;                          // board centre Y
+    translate([ 0, 0, back_t ]) for (hx = [ rcol_cx - power_hole_dx / 2, rcol_cx + power_hole_dx / 2 ], hy = [ cy - power_hole_dy / 2, cy + power_hole_dy / 2 ]) translate([ hx, hy, 0 ]) difference() {
+        cylinder(h = power_post_h, d = power_post_d);
+        translate([ 0, 0, 1 ]) cylinder(h = power_post_h, d = power_pilot);
     }
 }
 
 // --- placement outlines ---
+
 module footprint_outline(cx, cy, w, h) // outline sized to the EXACT footprint (grows inward, so the part hides it)
     translate([ 0, 0, back_t ]) linear_extrude(outline_h) difference() {
     translate([ cx, cy ]) square([ w, h ], center = true);
     translate([ cx, cy ]) square([ w - 2 * outline_t, h - 2 * outline_t ], center = true);
 }
+
 // raised rectangular outline on the inner face of the RIGHT wall (leny along Y, lenz up Z)
 module wall_outline_r(cy, cz, leny, lenz) translate([ ext_w - wall - outline_h / 2, cy, cz ]) difference() {
     cube([ outline_h, leny, lenz ], center = true);
@@ -329,21 +326,20 @@ module wall_outline_r(cy, cz, leny, lenz) translate([ ext_w - wall - outline_h /
 }
 
 module placement_outlines() {
-    footprint_outline((pack_x0 + pack_x1) / 2, (pack_y0 + pack_y1) / 2, pack_w, pack_y1 - pack_y0); // 18650 pack
-    footprint_outline(rcol_cx, wall + bms_lift_y + bms_h / 2, bms_w, bms_h);                        // BMS
-    footprint_outline(rcol_cx, wall + bms_lift_y + bms_h + bms_pb_gap + pb_h / 2, pb_w, pb_h);      // power board
+    footprint_outline((pack_x0 + pack_x1) / 2, (pack_y0 + pack_y1) / 2, pack_w, pack_y1 - pack_y0);        // 18650 pack
+    footprint_outline(rcol_cx, wall + bms_lift_y + bms_h / 2, bms_w, bms_h);                               // BMS
+    footprint_outline(rcol_cx, wall + bms_lift_y + bms_h + bms_power_gap + power_h / 2, power_w, power_h); // power board
     if (fuse_holder_external)
-        wall_outline_r(fuse_block_y, fuse_block_z, fuse_block_len, fuse_block_w); // external fuse carrier (on the right wall)
+        wall_outline_r(fuse_holder_y, fuse_holder_z, fuse_holder_len, fuse_holder_w); // external fuse carrier (on the right wall)
 }
 
 module base() {
     difference() {
         union() {
             base_shell();
-            battery_brackets();
-            support_pads();
+            pack_mount();
             bms_mount();
-            power_posts();
+            power_mount();
             if (outline_on)
                 placement_outlines();
         }
@@ -355,6 +351,7 @@ module base() {
 // ==========================================================================
 //  COVER  (modelled panel-DOWN = print orientation: panel on the bed, lip + lugs up)
 // ==========================================================================
+
 module cover_lip() { // frame that slots inside the base walls
     ow = ext_w - 2 * wall - 2 * lip_clear;
     oh = ext_h - 2 * wall - 2 * lip_clear;
@@ -363,6 +360,7 @@ module cover_lip() { // frame that slots inside the base walls
         translate([ ext_w / 2, ext_h / 2 ]) rrect(ow - 2 * lip_t, oh - 2 * lip_t, max(0.5, corner_r - wall - lip_t));
     }
 }
+
 module lug_prism(reach, zlo, zhi, w)                                                                                          // local: shelf at zlo (-> +Z/pull-off after the cover flips), ramp above
     rotate([ 90, 0, 0 ]) translate([ 0, 0, -w / 2 ]) linear_extrude(w) polygon([ [ -1, zlo ], [ reach, zlo ], [ -1, zhi ] ]); // -1 embeds into the lip to fuse
 
@@ -374,21 +372,19 @@ module cover_lugs() { // on the lip outer faces, left & right; print-orientation
         translate([ wall + lip_clear, y, 0 ]) mirror([ 1, 0, 0 ]) lug_prism(lug_reach, zlo, zhi, lug_w); // left (-X)
     }
 }
+
 module cover_grill() { // bottom half of the panel
     ys = [for (y = [wall + grill_marg:grill_pitch:ext_h / 2]) y];
     len = ext_w - 2 * grill_marg;
     for (y = ys)
         translate([ ext_w / 2, y, -1 ]) zslot(len, grill_slot, cover_t + 2);
 }
+
 module cover_mono() // one quiet hat, debossed; placement/orientation via mono_x / mono_y / mono_rot
     translate([ ext_w * mono_x, ext_h *mono_y, -0.01 ]) linear_extrude(mono_sink) rotate([ 0, 0, mono_rot ]) monotile2d();
 
-// rectangular meter / display window, cut SQUARE through the panel. With the LEFT/RIGHT assembly
-// flip, this print frame maps straight to the assembled view, so X is from the DC-side (left) edge
-// and Y down from the top edge.
 module cover_meter() translate([ meter_x_in + meter_w / 2, ext_h - meter_y_in - meter_h / 2, -1 ]) linear_extrude(cover_t + 2) rotate(meter_rot) square([ meter_w, meter_h ], center = true);
 
-// column of relocated LED holes, outboard of the meter (toward the DC-side edge), reading top-down.
 module cover_leds() translate([ led_cover_x, ext_h - led_cover_y1, 0 ]) rotate([ 0, 0, led_cover_rot ]) for (i = [0 :led_cover_n - 1]) translate([ 0, -i *led_cover_pitch, -1 ]) cylinder(h = cover_t + 2, d = led_cover_d);
 
 module cover() {
@@ -413,6 +409,7 @@ module cover() {
 // ==========================================================================
 // Each block is placed in the model frame exactly where its furniture seats it, so wrapping
 // components() in the same mir() as the base keeps every part aligned after the L<->R flip.
+
 module comp_block(x, y, z, sx, sy, sz, col) // axis-aligned block by min-corner + size
     color(col) translate([ x, y, z ]) cube([ sx, sy, sz ]);
 
@@ -422,17 +419,17 @@ module components() {
     // BMS — on its standoff pads, lifted off the floor for wire clearance
     comp_block(rcol_cx - bms_w / 2, wall + bms_lift_y, back_t + bms_lift_z, bms_w, bms_h, bms_body_h, [ 0.15, 0.35, 0.78 ]);
     // power board — on its 4 posts, above the BMS
-    comp_block(rcol_cx - pb_w / 2, wall + bms_lift_y + bms_h + bms_pb_gap, back_t + pb_post_h, pb_w, pb_h, pb_body_h, [ 0.16, 0.52, 0.27 ]);
+    comp_block(rcol_cx - power_w / 2, wall + bms_lift_y + bms_h + bms_power_gap, back_t + power_post_h, power_w, power_h, power_body_h, [ 0.16, 0.52, 0.27 ]);
     // fuse carrier — mounts on the OUTSIDE of the solid RIGHT wall; its 2 bolts + the lead slot
     // pass through the wall. Block sits proud of the exterior face, aligned to the wall outline.
     if (fuse_holder_external)
-        comp_block(ext_w, fuse_block_y - fuse_block_len / 2, back_t + 1, fuse_body_d, fuse_block_len, fuse_block_w, [ 0.88, 0.47, 0.11 ]);
+        comp_block(ext_w, fuse_holder_y - fuse_holder_len / 2, back_t + 1, fuse_body_d, fuse_holder_len, fuse_holder_w, [ 0.88, 0.47, 0.11 ]);
     // DC socket — barrel poking in through the RIGHT wall
     color([ 0.12, 0.12, 0.12 ]) translate([ ext_w - wall - dc_body_len, dc_input_y, (back_t + base_wall_h) * dc_z_frac ]) rotate([ 0, 90, 0 ]) cylinder(h = dc_body_len, d = dc_input_d + 3);
     // LEDs — bodies poking in through the TOP wall (only when led_side)
     if (led_side)
         for (i = [0:led_side_n - 1])
-            color([ 0.90, 0.22, 0.20 ]) translate([ ext_w - led_side_offset - i * led_pitch, ext_h - wall - led_body_len, (back_t + base_wall_h) * dc_z_frac ]) rotate([ -90, 0, 0 ]) cylinder(h = led_body_len, d = led_side_d);
+            color([ 0.90, 0.22, 0.20 ]) translate([ ext_w - led_side_offset - i * led_side_pitch, ext_h - wall - led_body_len, (back_t + base_wall_h) * dc_z_frac ]) rotate([ -90, 0, 0 ]) cylinder(h = led_body_len, d = led_side_d);
     // meter body — hangs under the front panel; check it clears the pack top (pack top vs base_wall_h)
     if (meter_on)
         translate([ ext_w - meter_x_in - meter_w / 2, ext_h - meter_y_in - meter_h / 2, base_wall_h - meter_depth ]) rotate([ 0, 0, meter_rot ]) comp_block(-meter_w / 2, -meter_h / 2, 0, meter_w, meter_h, meter_depth, [ 0.55, 0.35, 0.65 ]);
@@ -441,11 +438,12 @@ module components() {
 // ==========================================================================
 //  FIT CHECK
 // ==========================================================================
+
 echo(str("UPS interior (W x H x D) = ", ext_w - 2 * wall, " x ", ext_h - 2 * wall, " x ", ext_d - back_t));
 if (pack_y0 + pack_h > ext_h - wall - pack_br_t)
     echo(str("WARNING: pack length ", pack_h, " overruns the box (top bracket clamped); raise ext_h ~", pack_y0 + pack_h + wall + pack_br_t + 2));
-if (rcol_cx + max(pb_w, bms_w) / 2 > ext_w - wall)
-    echo(str("WARNING: BMS/board column (right edge ", rcol_cx + max(pb_w, bms_w) / 2, ") overruns the right wall at ", ext_w - wall, "; reduce pack_w/pb_w or raise ext_w"));
+if (rcol_cx + max(power_w, bms_w) / 2 > ext_w - wall)
+    echo(str("WARNING: BMS/board column (right edge ", rcol_cx + max(power_w, bms_w) / 2, ") overruns the right wall at ", ext_w - wall, "; reduce pack_w/power_w or raise ext_w"));
 if (pack_depth + pack_pad_h + back_t > ext_d)
     echo(str("WARNING: pack depth+standoff ", pack_depth + pack_pad_h + back_t, " > ext_d ", ext_d, " (raise ext_d ~", pack_depth + pack_pad_h + back_t + cover_t + 2, ")"));
 
@@ -454,6 +452,7 @@ if (pack_depth + pack_pad_h + back_t > ext_d)
 // ==========================================================================
 // mir() reflects a part about its own X mid-plane when mirror_lr is set (applied innermost,
 // so the base and the flipped cover stay aligned in X).
+
 module mir() {
     if (mirror_lr)
         translate([ ext_w, 0, 0 ]) mirror([ 1, 0, 0 ]) children();
