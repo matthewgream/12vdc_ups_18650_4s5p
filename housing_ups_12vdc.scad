@@ -40,6 +40,7 @@
 //                                 true  = panel LEDs drilled in the top wall, top grill left half
 //   show_components      [true]   assembly view: colour block stand-ins for the fitted parts
 //   meter_on, led_cover_on [true] front-panel meter window + relocated LED holes (on the cover)
+//   cover_wall_h         [20]     raised side wall on the cover for extra depth (0 = flat cover)
 
 // ==========================================================================
 //  PARAMETERS
@@ -143,6 +144,11 @@ outline_t = 0.75; // outline line thickness
 outline_h = 0.75; // outline raised height
 
 // -------------------------------- COVER -----------------------------------
+
+// Optional raised side wall on the cover: a flush skirt (same section as the base wall) that
+// stacks on the base's top rim to add interior depth WITHOUT touching the already-printed base.
+// The lip + lugs below it are unchanged, so the cover still seats the same. 0 = flat cover.
+cover_wall_h = 20; // height (Z) of the cover's own side wall; adds this much enclosure depth
 
 lip_h = 5;       // how far the cover lip slots down inside the base walls
 lip_t = 2.5;     // lip wall thickness
@@ -355,17 +361,23 @@ module base() {
 module cover_lip() { // frame that slots inside the base walls
     ow = ext_w - 2 * wall - 2 * lip_clear;
     oh = ext_h - 2 * wall - 2 * lip_clear;
-    translate([ 0, 0, cover_t ]) linear_extrude(lip_h) difference() {
+    translate([ 0, 0, cover_t ]) linear_extrude(lip_h + cover_wall_h) difference() { // runs the full cover height so the lip stays rooted on the panel; only the top lip_h enters the base
         translate([ ext_w / 2, ext_h / 2 ]) rrect(ow, oh, max(0.5, corner_r - wall));
         translate([ ext_w / 2, ext_h / 2 ]) rrect(ow - 2 * lip_t, oh - 2 * lip_t, max(0.5, corner_r - wall - lip_t));
     }
+}
+
+module cover_wall() // flush raised skirt: same section as the base wall, stacked on its top rim (print: up from the panel)
+    translate([ 0, 0, cover_t ]) linear_extrude(cover_wall_h) difference() {
+    translate([ ext_w / 2, ext_h / 2 ]) rrect(ext_w, ext_h, corner_r);
+    translate([ ext_w / 2, ext_h / 2 ]) rrect(ext_w - 2 * wall, ext_h - 2 * wall, max(0.5, corner_r - wall));
 }
 
 module lug_prism(reach, zlo, zhi, w)                                                                                          // local: shelf at zlo (-> +Z/pull-off after the cover flips), ramp above
     rotate([ 90, 0, 0 ]) translate([ 0, 0, -w / 2 ]) linear_extrude(w) polygon([ [ -1, zlo ], [ reach, zlo ], [ -1, zhi ] ]); // -1 embeds into the lip to fuse
 
 module cover_lugs() { // on the lip outer faces, left & right; print-orientation z = up from panel
-    zlo = cover_t + lug_from_rim;
+    zlo = cover_t + cover_wall_h + lug_from_rim;
     zhi = zlo + lug_t;
     for (y = lug_ys) {
         translate([ ext_w - wall - lip_clear, y, 0 ]) lug_prism(lug_reach, zlo, zhi, lug_w);             // right (+X)
@@ -391,6 +403,8 @@ module cover() {
     difference() {
         union() {
             linear_extrude(cover_t) translate([ ext_w / 2, ext_h / 2 ]) rrect(ext_w, ext_h, corner_r);
+            if (cover_wall_h > 0)
+                cover_wall();
             cover_lip();
             cover_lugs();
         }
@@ -439,13 +453,13 @@ module components() {
 //  FIT CHECK
 // ==========================================================================
 
-echo(str("UPS interior (W x H x D) = ", ext_w - 2 * wall, " x ", ext_h - 2 * wall, " x ", ext_d - back_t));
+echo(str("UPS interior (W x H x D) = ", ext_w - 2 * wall, " x ", ext_h - 2 * wall, " x ", ext_d - back_t + cover_wall_h, " (incl. cover wall ", cover_wall_h, ")"));
 if (pack_y0 + pack_h > ext_h - wall - pack_br_t)
     echo(str("WARNING: pack length ", pack_h, " overruns the box (top bracket clamped); raise ext_h ~", pack_y0 + pack_h + wall + pack_br_t + 2));
 if (rcol_cx + max(power_w, bms_w) / 2 > ext_w - wall)
     echo(str("WARNING: BMS/board column (right edge ", rcol_cx + max(power_w, bms_w) / 2, ") overruns the right wall at ", ext_w - wall, "; reduce pack_w/power_w or raise ext_w"));
-if (pack_depth + pack_pad_h + back_t > ext_d)
-    echo(str("WARNING: pack depth+standoff ", pack_depth + pack_pad_h + back_t, " > ext_d ", ext_d, " (raise ext_d ~", pack_depth + pack_pad_h + back_t + cover_t + 2, ")"));
+if (pack_depth + pack_pad_h + back_t > ext_d + cover_wall_h)
+    echo(str("WARNING: pack depth+standoff ", pack_depth + pack_pad_h + back_t, " > available ", ext_d + cover_wall_h, " (raise ext_d/cover_wall_h ~", pack_depth + pack_pad_h + back_t + cover_t + 2 - (ext_d + cover_wall_h), " more)"));
 
 // ==========================================================================
 //  DISPATCH
@@ -470,7 +484,7 @@ else if (part == "assembly") {
         mir() components(); // block stand-ins, seated in place, flipped with the base
     // flip the (panel-down) cover LEFT/RIGHT (about its long Y axis) onto the base front — this is
     // how it is assembled, so cover cutouts placed on the DC side land by the DC after the flip
-    color("LightSteelBlue", 0.6) translate([ ext_w, 0, base_wall_h + cover_t ]) rotate([ 0, 180, 0 ]) mir() cover();
+    color("LightSteelBlue", 0.6) translate([ ext_w, 0, base_wall_h + cover_wall_h + cover_t ]) rotate([ 0, 180, 0 ]) mir() cover();
 } else { // "all" -- side by side
     mir() base();
     translate([ ext_w + 25, 0, 0 ]) color("LightSteelBlue") mir() cover();
