@@ -353,6 +353,7 @@ SoC figures are approximate for LG MJ1. They depend on chemistry, temperature an
 <a href="images/housing_ups_12vdc_bench_test.jpg"><img src="images/housing_ups_12vdc_bench_test_1.jpg" alt="Bench test of the UPS module, pack and wiring before assembly" width="800"></a>
 
 _Bench test before assembly._ Tests run:
+- Configure all parameters and check voltages and currents.
 - Output stays up on the 24 V adapter and when the adapter is unplugged (battery).
 - Discharge on battery past the restart threshold, then restore the adapter and monitor charging through to termination. Measure the charged pack voltage.
 - Repeat with the pack drained down to the undervoltage cutoff.
@@ -362,7 +363,8 @@ _Bench test before assembly._ Tests run:
 <a href="images/housing_ups_12vdc_bench_test.jpg"><img src="images/housing_ups_12vdc_bench_test_2.jpg" alt="Bench test of the UPS module, pack and wiring during assembly" width="800"></a>
 
 _Bench test during assembly._ Tests run:
-- Verify power on all wiring paths.
+- Verify power and polarity on all wiring paths.
+- Check assembly fitting (identified that the choice of inline fuse holders requires bulking out the cover).
 
 ---
 
