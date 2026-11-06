@@ -158,7 +158,7 @@ lug_w = 12;                              // lug width (along the wall)
 lug_t = 2.5;                             // lug height along Z (the catch depth)
 lug_from_rim = 2.5;                      // lug band, measured in from the cover rim (where it catches the wall hole)
 lug_ys = [ ext_h * 0.25, ext_h * 0.75 ]; // 2 lugs per long wall; also drives the matching base holes
-lug_reach = wall + lip_clear + 0.2 - 2;  // protrude to just past the outer wall face
+lug_reach = wall + lip_clear + 0.2 - 1;  // protrude to just past the outer wall face
 lug_hole_clr = 0.6;
 
 meter_on = true;  // rectangular display/meter window through the front panel
@@ -171,7 +171,7 @@ meter_rot = 90;   // rotate the window about its centre (deg); 90 stands it on e
 
 led_cover_on = true;  // vertical pair of relocated LED holes, just outboard of the meter
 led_cover_d = 6;      // LED hole Ø
-led_cover_x = 12.5;   // LED column centre, in from the DC-side edge (sits between meter & edge)
+led_cover_x = 10;   // LED column centre, in from the DC-side edge (sits between meter & edge)
 led_cover_y1 = 15;    // first (upper) LED centre, down from the top edge
 led_cover_pitch = 10; // next LED this far below the first (centre-to-centre)
 led_cover_n = 2;      // LEDs in the column
