@@ -366,6 +366,10 @@ _Bench test during assembly._ Tests run:
 - Verify power and polarity on all wiring paths.
 - Check assembly fitting (identified that the choice of inline fuse holders requires bulking out the cover).
 
+### Built
+
+<a href="images/housing_ups_12vdc_built.jpg"><img src="images/housing_ups_12vdc_built.jpg" alt="Built version, with battery monitor installed" width="800"></a>
+
 ---
 
 ## Design rationale
