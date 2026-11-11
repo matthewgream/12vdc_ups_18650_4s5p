@@ -370,6 +370,8 @@ _Bench test during assembly._ Tests run:
 
 <a href="images/housing_ups_12vdc_built.jpg"><img src="images/housing_ups_12vdc_built.jpg" alt="Built version, with battery monitor installed" width="800"></a>
 
+_Build complete, with <a href="https://docs.google.com/document/d/1GiLOf5nCyJNSllKJYwVlJ6xkPohoDqQ-DGhpVirwHKc/view">label</a>_
+
 ---
 
 ## Design rationale
